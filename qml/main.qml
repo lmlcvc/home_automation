@@ -54,15 +54,19 @@ ApplicationWindow {
 
             Button {
                 text: "Settings"
+                onClicked: {
+                    contentLoader.source = "settings.qml"
+                }
             }
         }
 
         // Content area
         Loader {
             id: contentLoader
-            Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
-            source: "dashboard.qml"
+            Layout.preferredWidth: mainAppWindow.width
+            Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
+            source: "settings.qml"
         }
 
         // Right side buttons
