@@ -3,24 +3,24 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Item {
+    width: parent.width // Specify the width
+    height: contentColumn.height // Adjust the height based on the content
+
     property var itemData: {}
     property int buttonSize: 36
 
     Rectangle {
         id: background
-        anchors.fill: parent
         color: "#6aff6a"
+        width: parent.width
+        height: parent.height
     }
 
     property string roomName: modelData.roomName
     property var devices: modelData.devices
 
-    Component.onCompleted: {
-        console.log("Room Name:", roomName);
-        console.log("Devices:", devices);
-    }
-
     ColumnLayout {
+        id: contentColumn
         width: parent.width
         spacing: 10
         Layout.fillWidth: true
@@ -37,6 +37,7 @@ Item {
 
             Text {
                 text: roomName
+                color: "pink"
             }
 
             Button {
