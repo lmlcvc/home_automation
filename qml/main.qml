@@ -8,7 +8,7 @@ ApplicationWindow {
     // Set window dimensions and properties
     width: 1280
     height: 720
-    minimumWidth: 640           // TODO write as variables/percentages
+    minimumWidth: 640
     minimumHeight: 360
     visible: true
     title: "Home Automation"
@@ -123,58 +123,44 @@ ApplicationWindow {
                     spacing: 3
 
                     Repeater {
-                        model: rightTabBar.contentModel
+                        model: roomModel // Bind the model to the Repeater
+                        delegate: FeatureButton {
+                            text: model.roomName
+                            icon.name: model.roomIcon
+                            Layout.maximumHeight: featurebutton_control.height
+                            Layout.fillHeight: true
+                        }
                     }
                 }
-
-                Item {
-                    Layout.fillHeight: true
-                }
-
-                FeatureButton {
-                    text: qsTr("Living Room")
-                    icon.name: "living-room"
-
-                    Layout.maximumHeight: featurebutton_control.height
-                    Layout.fillHeight: true
-                }
-                FeatureButton {
-                    text: qsTr("Bedroom 1")
-                    icon.name: "bedroom1"
-                    checked: true
-
-                    Layout.maximumHeight: featurebutton_control.height
-                    Layout.fillHeight: true
-                }
-                FeatureButton {
-                    text: qsTr("Bedroom 2")
-                    icon.name: "bedroom2"
-
-                    Layout.maximumHeight: featurebutton_control.height
-                    Layout.fillHeight: true
-                }
-                FeatureButton {
-                    text: qsTr("Dining Room")
-                    icon.name: "dining-room"
-
-                    Layout.maximumHeight: featurebutton_control.height
-                    Layout.fillHeight: true
-                }
-                FeatureButton {
-                    text: qsTr("Bathroom")
-                    icon.name: "bathroom"
-
-                    Layout.maximumHeight: featurebutton_control.height
-                    Layout.fillHeight: true
-                }
-                FeatureButton {
-                    text: qsTr("Garage")
-                    icon.name: "garage"
-
-                    Layout.maximumHeight: featurebutton_control.height
-                    Layout.fillHeight: true
-                }
             }
+        }
+    }
+
+    ListModel {
+        id: roomModel
+        ListElement {
+            roomName: "Living Room"
+            roomIcon: "living-room"
+        }
+        ListElement {
+            roomName: "Bedroom 1"
+            roomIcon: "bedroom1"
+        }
+        ListElement {
+            roomName: "Bedroom 2"
+            roomIcon: "bedroom2"
+        }
+        ListElement {
+            roomName: "Dining Room"
+            roomIcon: "dining-room"
+        }
+        ListElement {
+            roomName: "Bathroom"
+            roomIcon: "bathroom"
+        }
+        ListElement {
+            roomName: "Garage"
+            roomIcon: "garage"
         }
     }
 }
