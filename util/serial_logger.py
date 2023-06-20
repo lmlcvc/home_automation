@@ -4,6 +4,13 @@ import serial
 from util.serial_thread import SerialThread
 
 
+LOG_THRESHOLD_HOURS = 24
+TEMPERATURE_RANGE = (-50, 100)
+HUMIDITY_RANGE = (0, 100)
+POSITIVE_MIN = 0
+BRIGHTNESS_RANGE = (0, 1000)
+
+
 def remove_outdated_logs(log_file):
     with open(log_file, 'r') as file:
         lines = file.readlines()
@@ -14,8 +21,8 @@ def remove_outdated_logs(log_file):
     timestamp_format = '%Y-%m-%d %H:%M:%S'
     current_time = datetime.now()
 
-    # Calculate the timestamp threshold for outdated logs (24 hours ago from the current time)
-    threshold = current_time - timedelta(hours=24)
+    # Calculate the timestamp threshold for outdated logs
+    threshold = current_time - timedelta(hours=LOG_THRESHOLD_HOURS)
 
     # Filter the log entries that are within the threshold
     filtered_entries = [line for line in lines if
@@ -30,16 +37,16 @@ def is_valid_value(measurement, value):
     # Perform validity checks based on the measurement type and value
     if measurement == 'T':                              # within range
         value = float(value)
-        return -50 <= value <= 100
+        return TEMPERATURE_RANGE[0] <= value <= TEMPERATURE_RANGE[1]
     elif measurement == 'H':                            # within range
         value = float(value)
-        return 0 <= value <= 100
+        return HUMIDITY_RANGE[0] <= value <= HUMIDITY_RANGE[1]
     elif measurement == 'P' or measurement == 'C':      # positive
         value = float(value)
-        return value >= 0
+        return value >= POSITIVE_MIN
     elif measurement == 'B':                            # within range
         value = float(value)
-        return 0 <= value <= 1000
+        return BRIGHTNESS_RANGE[0] <= value <= BRIGHTNESS_RANGE[1]
     else:                                               # Unknown measurement type, consider it invalid
         return False
 
@@ -63,11 +70,12 @@ class SerialLogger:
         return self.serial_port.readline().decode().strip()
 
     def handle_serial_message(self, message):
-        print(f"{datetime.now()} - Received message: {message}")
+        current_time = datetime.now()
+        print(f"{current_time} - Received message: {message}")
 
         parts = message.split()
         if len(parts) != 3:
-            print(f"{datetime.now()} - Invalid serial message: {message}")
+            print(f"{current_time} - Invalid serial message: {message}")
             self.log_error(message)
             return
 
@@ -76,13 +84,13 @@ class SerialLogger:
         value = parts[2]
 
         if measurement not in ('T', 'H', 'P', 'B', 'C'):
-            print(f"{datetime.now()} - Invalid measurement: {measurement}")
+            print(f"{current_time} - Invalid measurement: {measurement}")
             self.log_error(message)
             return
 
         # Validity checks
         if not is_valid_value(measurement, value):
-            print(f"{datetime.now()} - Invalid value: {value}")
+            print(f"{current_time} - Invalid value: {value}")
             self.log_error(message)
             return
 
@@ -99,7 +107,7 @@ class SerialLogger:
 
         os.makedirs(log_dir, exist_ok=True)  # Create the log directory if it doesn't exist
 
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
         log_entry = f"{timestamp}, {measurement}, {value}\n"
 
         with open(log_file, 'a') as file:  # Open the file in append mode
