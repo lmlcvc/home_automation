@@ -151,17 +151,17 @@ ApplicationWindow {
         }
     }
 
-    Connections {
-        target: contentLoader.item
-
-        // Connect the roomClicked signal to the appropriate slot in the backend
-        onRoomClicked: {
-            backend.roomClicked(roomId, roomName);
-        }
-
-        // Connect the addRoom signal to the appropriate slot in the backend
-        onAddRoom: {
-            backend.addRoom(roomId, roomName, roomIcon);
-        }
-    }
+//    Connections {
+//        target: contentLoader.item
+//
+//        // Connect the roomClicked signal to the appropriate slot in the backend
+//        function onRoomClicked(roomId, roomName) {
+//            backend.roomClicked(roomId, roomName);
+//        }
+//
+//        // Connect the addRoom signal to the appropriate slot in the backend
+//        function onAddRoom(roomId, roomName, roomIcon) {
+//            backend.addRoom(roomId, roomName, roomIcon);
+//        }
+//    }
 }

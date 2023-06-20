@@ -5,7 +5,7 @@ from datetime import datetime
 
 class RoomController:
     def __init__(self):
-        self.serial_port = serial.Serial('COM1', 9600)  # Replace 'COM1' with the appropriate serial port
+        self.serial_port = None  # serial.Serial('COM1', 9600)  # Replace 'COM1' with the appropriate serial port
         self.room_list = []
 
     def send_message(self, message):
