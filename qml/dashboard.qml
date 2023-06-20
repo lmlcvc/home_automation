@@ -88,14 +88,14 @@ spacing: 10
                 buttons: rightTabBarContentLayout.children
             }
 
-            contentItem: ColumnLayout {
+            contentItem: ColumnLayout {         // FIXME model data not displaying. loaded properly into backend
                 id: rightTabBarContentLayout
                 spacing: 3
 
                 Repeater {
                     model: roomModel // Bind the model to the Repeater
                     delegate: FeatureButton {
-                        text: model.roomName
+                        text: model.roomName // Display the room name
                         icon.name: model.roomIcon
                         Layout.maximumHeight: featurebutton_control.height
                         Layout.fillHeight: true

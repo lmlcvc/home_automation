@@ -1,22 +1,26 @@
 import json
-
-from PyQt5.QtCore import QObject, pyqtSlot
-
-from util.serial_logger import SerialLogger
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 
 class Backend(QObject):
+    dataLoaded = pyqtSignal()  # Signal to notify QML about data loading
+
     def __init__(self):
         super().__init__()
-        self.room_list = self.load_room_list()
-        self.serial_logger = SerialLogger()
+        self.room_list = []
+        self.load_room_list()
 
     def load_room_list(self):
         try:
             with open('../room_list.json', 'r') as file:
-                return json.load(file)
+                room_json = json.load(file)
+                self.room_list = [room['name'] for room in room_json]
+                print("Loaded room names:", self.room_list)
         except FileNotFoundError:
-            return []
+            self.room_list = []
+            print("Room list file not found.")
+
+        return self.room_list
 
     def save_room_list(self):
         with open('../room_list.json', 'w') as file:
@@ -24,7 +28,6 @@ class Backend(QObject):
 
     @pyqtSlot(str)
     def addRoom(self, room_name):
-        # Find the next available ID
         next_id = 0
         if self.room_list:
             existing_ids = [room['id'] for room in self.room_list]
@@ -36,3 +39,9 @@ class Backend(QObject):
         }
         self.room_list.append(room)
         self.save_room_list()
+
+    @pyqtSlot(result=list)
+    def loadData(self):
+        self.load_room_list()
+        self.dataLoaded.emit()
+        return self.room_list

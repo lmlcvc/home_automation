@@ -105,6 +105,14 @@ ApplicationWindow {
 
     RoomListModel {
         id: roomModel
+
+        Component.onCompleted: {
+            var loadedList = backend.loadData()
+            console.log(loadedList)
+
+            roomModel.updateModel(loadedList)
+        }
+
         onRoomClicked: {
             backend.roomClicked(roomId, roomName);
         }

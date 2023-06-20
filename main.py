@@ -13,6 +13,7 @@ if __name__ == '__main__':
     # Register the backend object as a context property
     engine.rootContext().setContextProperty("backend", backend)
 
+    # Load the QML file
     engine.load("qml/main.qml")
 
     app.exec_()
