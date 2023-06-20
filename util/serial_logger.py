@@ -66,13 +66,14 @@ class SerialLogger:
         print(f"{datetime.now()} - Received message: {message}")
 
         parts = message.split()
-        if len(parts) != 2:
+        if len(parts) != 3:
             print(f"{datetime.now()} - Invalid serial message: {message}")
             self.log_error(message)
             return
 
-        measurement = parts[0]
-        value = parts[1]
+        room_id = parts[0]
+        measurement = parts[1]
+        value = parts[2]
 
         if measurement not in ('T', 'H', 'P', 'B', 'C'):
             print(f"{datetime.now()} - Invalid measurement: {measurement}")
@@ -93,7 +94,10 @@ class SerialLogger:
             'C': 'power_consumption'
         }
         measurement_name = measurement_names[measurement]
-        log_file = os.path.join(os.getcwd(), self.log_dir, f"{measurement_name}.log")  # Use absolute path
+        log_dir = os.path.join(os.getcwd(), self.log_dir, room_id)  # Use absolute path for log directory
+        log_file = os.path.join(log_dir, f"{measurement_name}.log")  # Use absolute path for log file
+
+        os.makedirs(log_dir, exist_ok=True)  # Create the log directory if it doesn't exist
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         log_entry = f"{timestamp}, {measurement}, {value}\n"
@@ -104,12 +108,14 @@ class SerialLogger:
         remove_outdated_logs(log_file)
 
     def log_error(self, message):
-        measurement = message.split()[0]
+        room_id = message.split()[0]
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        log_entry = f"{timestamp}, {measurement}, ERROR\n"
+        log_entry = f"{timestamp}, ERROR: {message}\n"
 
-        log_file = os.path.join(os.getcwd(), self.log_dir, f"error.log")  # Use absolute path for error log
+        log_dir = os.path.join(os.getcwd(), self.log_dir, room_id)  # Use absolute path for log directory
+        os.makedirs(log_dir, exist_ok=True)  # Create the log directory if it doesn't exist
+
+        log_file = os.path.join(log_dir, "error.log")  # Use absolute path for error log
 
         with open(log_file, 'a') as file:  # Open the error log file in append mode
             file.write(log_entry)
-
