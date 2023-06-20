@@ -15,8 +15,8 @@ Item {
         height: 60 // contentColumn.height
     }
 
-    property string roomName: modelData.roomName
-    property var devices: modelData.devices
+    property string roomName: itemData.roomName
+    property var devices: itemData.devices
 
     ColumnLayout {
         id: contentColumn
@@ -97,16 +97,16 @@ Item {
             model: devices
 
             delegate: Text {
-                text: modelData // Access each device string
+                text: modelData // Display the actual item from the device list
                 color: "white"
             }
         }
     }
 
-    // Bind itemData property to modelData in delegate item
+    // Bind itemData property to itemData in delegate item
     Binding {
         target: itemData
-        property: "modelData"
-        value: modelData
+        property: "roomName"
+        value: roomName
     }
 }

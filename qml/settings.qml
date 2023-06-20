@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.15
 
 ColumnLayout {
@@ -27,7 +28,7 @@ ColumnLayout {
             icon.source: "../images/add.png"
             Layout.alignment: Qt.AlignLeft
             onClicked: {
-                // Handle edit button clicked
+                addRoomDialog.open()
             }
         }
     }
@@ -37,16 +38,12 @@ ColumnLayout {
         Layout.fillHeight: true
 
         ListView {
-        // FIXME Only first item of rooms and devices are displayed
             id: list_rooms
             width: parent.width
             height: parent.height
 
-            model: [
-                { roomName: "Living Room", devices: ["Device 1", "Device 2", "Device 3"] },
-                { roomName: "Bedroom 1", devices: ["Device A", "Device B", "Device C"] },
-                { roomName: "Bedroom 2", devices: ["Device X", "Device Y", "Device Z"] }
-            ]
+            // Define the model as a ListModel
+            model: roomListModel
 
             delegate: RoomListItem {
                 width: parent.width
@@ -54,5 +51,47 @@ ColumnLayout {
                 itemData: model
             }
         }
+    }
+
+    Dialog {
+    // FIXME adding a room. Not rendering and modelData is not defined
+        id: addRoomDialog
+        title: "Add Room"
+        standardButtons: StandardButton.Ok | StandardButton.Cancel
+
+        ColumnLayout {
+            TextField {
+                id: roomNameField
+                placeholderText: "Enter room name"
+            }
+        }
+
+        onAccepted: {
+            // Call a function to add the room with the entered name
+            addRoom(roomNameField.text, []);
+        }
+    }
+
+    // Define the roomListModel as a separate JavaScript object
+    ListModel {
+        id: roomListModel
+    }
+
+    function addRoom(roomName, devices) {
+        // Create a new JavaScript object for the room
+        var room = {
+            roomName: roomName,
+            devices: devices
+        };
+
+        // Add the room object to the model
+        roomListModel.append(room);
+    }
+
+    // Initialize the model with default rooms
+    Component.onCompleted: {
+        addRoom("Living Room", ["Device 1", "Device 2", "Device 3"]);
+        addRoom("Bedroom 1", ["Device A", "Device B", "Device C"]);
+        addRoom("Bedroom 2", ["Device X", "Device Y", "Device Z"]);
     }
 }
