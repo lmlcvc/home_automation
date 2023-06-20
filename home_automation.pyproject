@@ -1,0 +1,11 @@
+{
+  "build-system": {
+    "requires": ["pyqt5"]
+  },
+  "files": [
+    "main.py",
+    "backend.py",
+    "qml/*.qml",
+    "images/*.png"
+  ]
+}
