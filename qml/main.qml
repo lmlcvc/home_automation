@@ -30,22 +30,16 @@ ApplicationWindow {
 
         // App control
         ColumnLayout {
+            id: buttons_control
+
             spacing: 10
             Layout.alignment: Qt.AlignTop
-
-            Button {
-                text: "Home"
-            }
 
             Button {
                 text: "Dashboard"
                 onClicked: {
                     contentLoader.source = "dashboard.qml"
                 }
-            }
-
-            Button {
-                text: "Statistics"
             }
 
             Button {
@@ -56,6 +50,7 @@ ApplicationWindow {
                 text: "Settings"
                 onClicked: {
                     contentLoader.source = "settings.qml"
+                    buttons_rooms.visible = false
                 }
             }
         }
@@ -66,13 +61,19 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.preferredWidth: mainAppWindow.width
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
-            source: "settings.qml"
+            source: "dashboard.qml"
+            onSourceChanged: {
+                buttons_rooms.visible = true
+            }
         }
 
         // Right side buttons
         ColumnLayout {
+            id: buttons_rooms
+
             spacing: 10
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
+            visible: contentLoader.source !== "settings.qml"
 
             Button {
                 text: "Living room"
