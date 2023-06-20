@@ -8,8 +8,8 @@ ApplicationWindow {
     // Set window dimensions and properties
     width: 1280
     height: 720
-    minimumWidth: 1180
-    minimumHeight: 663
+    minimumWidth: 640           // TODO write as variables/percentages
+    minimumHeight: 360
     visible: true
     title: "Home Automation"
 
@@ -29,28 +29,63 @@ ApplicationWindow {
         spacing: 10
 
         // App control
-        ColumnLayout {
+        ScrollView {
             id: buttons_control
+            Layout.fillHeight: true
 
-            spacing: 10
-            Layout.alignment: Qt.AlignTop
+            Container {
+                id: leftTabBar
 
-            Button {
-                text: "Dashboard"
-                onClicked: {
-                    contentLoader.source = "dashboard.qml"
+                currentIndex: 1
+
+                Layout.fillWidth: false
+                Layout.fillHeight: true
+
+                ButtonGroup {
+                    buttons: columnLayout.children
                 }
-            }
 
-            Button {
-                text: "Security"
-            }
+                contentItem: ColumnLayout {
+                    id: columnLayout
+                    spacing: 3
 
-            Button {
-                text: "Settings"
-                onClicked: {
-                    contentLoader.source = "settings.qml"
-                    buttons_rooms.visible = false
+                    Repeater {
+                        model: leftTabBar.contentModel
+                    }
+                }
+
+                FeatureButton {
+                    id: featurebutton_control
+                    text: qsTr("Dashboard")
+                    icon.name: "dashboard"
+                    Layout.fillHeight: true
+
+                    checked: true
+
+                    onClicked: {
+                        contentLoader.source = "dashboard.qml"
+                    }
+                }
+
+                FeatureButton {
+                    text: qsTr("Security")
+                    icon.name: "security"
+                    Layout.fillHeight: true
+
+                    onClicked: {
+                        contentLoader.source = ""
+                    }
+                }
+
+                FeatureButton {
+                    text: qsTr("Settings")
+                    icon.name: "settings"
+                    Layout.fillHeight: true
+
+                    onClicked: {
+                        contentLoader.source = "settings.qml"
+                        buttons_rooms.visible = false
+                    }
                 }
             }
         }
@@ -68,23 +103,77 @@ ApplicationWindow {
         }
 
         // Right side buttons
-        ColumnLayout {
+        ScrollView {
             id: buttons_rooms
+            Layout.fillHeight: true
 
-            spacing: 10
-            Layout.alignment: Qt.AlignTop | Qt.AlignRight
-            visible: contentLoader.source !== "settings.qml"
+            Container {
+                id: rightTabBar
 
-            Button {
-                text: "Living room"
-            }
+                currentIndex: 1
 
-            Button {
-                text: "Bedroom 1"
-            }
+                Layout.fillHeight: true
 
-            Button {
-                text: "Bedroom 2"
+                ButtonGroup {
+                    buttons: rightTabBarContentLayout.children
+                }
+
+                contentItem: ColumnLayout {
+                    id: rightTabBarContentLayout
+                    spacing: 3
+
+                    Repeater {
+                        model: rightTabBar.contentModel
+                    }
+                }
+
+                Item {
+                    Layout.fillHeight: true
+                }
+
+                FeatureButton {
+                    text: qsTr("Living Room")
+                    icon.name: "living-room"
+
+                    Layout.maximumHeight: featurebutton_control.height
+                    Layout.fillHeight: true
+                }
+                FeatureButton {
+                    text: qsTr("Bedroom 1")
+                    icon.name: "bedroom1"
+                    checked: true
+
+                    Layout.maximumHeight: featurebutton_control.height
+                    Layout.fillHeight: true
+                }
+                FeatureButton {
+                    text: qsTr("Bedroom 2")
+                    icon.name: "bedroom2"
+
+                    Layout.maximumHeight: featurebutton_control.height
+                    Layout.fillHeight: true
+                }
+                FeatureButton {
+                    text: qsTr("Dining Room")
+                    icon.name: "dining-room"
+
+                    Layout.maximumHeight: featurebutton_control.height
+                    Layout.fillHeight: true
+                }
+                FeatureButton {
+                    text: qsTr("Bathroom")
+                    icon.name: "bathroom"
+
+                    Layout.maximumHeight: featurebutton_control.height
+                    Layout.fillHeight: true
+                }
+                FeatureButton {
+                    text: qsTr("Garage")
+                    icon.name: "garage"
+
+                    Layout.maximumHeight: featurebutton_control.height
+                    Layout.fillHeight: true
+                }
             }
         }
     }
