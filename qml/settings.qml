@@ -37,6 +37,7 @@ ColumnLayout {
         Layout.fillHeight: true
 
         ListView {
+        // FIXME Only first item of rooms and devices are displayed
             id: list_rooms
             width: parent.width
             height: parent.height
@@ -49,6 +50,7 @@ ColumnLayout {
 
             delegate: RoomListItem {
                 width: parent.width
+                height: 60
                 itemData: model
             }
         }

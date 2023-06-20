@@ -4,7 +4,6 @@ import QtQuick.Layouts 1.15
 
 Item {
     width: parent.width // Specify the width
-    height: contentColumn.height // Adjust the height based on the content
 
     property var itemData: {}
     property int buttonSize: 36
@@ -13,7 +12,7 @@ Item {
         id: background
         color: "#6aff6a"
         width: parent.width
-        height: parent.height
+        height: 60 // contentColumn.height
     }
 
     property string roomName: modelData.roomName
@@ -37,7 +36,6 @@ Item {
 
             Text {
                 text: roomName
-                color: "pink"
             }
 
             Button {
