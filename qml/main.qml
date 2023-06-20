@@ -147,7 +147,8 @@ ApplicationWindow {
             backend.roomClicked(roomId, roomName);
         }
         onAddRoom: {
-            backend.addRoom(roomId, roomName, roomIcon);
+            backend.addRoom(roomName);
+            //backend.addRoom(roomId, roomName, roomIcon);
         }
     }
 
