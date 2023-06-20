@@ -1,11 +1,7 @@
-import json
-
-from PyQt5.QtCore import QObject, pyqtSlot
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtQml import QQmlApplicationEngine
-import os
 
-from backend import Backend
+from util.backend import Backend
 
 if __name__ == '__main__':
     app = QGuiApplication([])
