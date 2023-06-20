@@ -42,8 +42,8 @@ ColumnLayout {
             width: parent.width
             height: parent.height
 
-            // Define the model as a ListModel
-            model: roomListModel
+            // Define the model as the roomModel from main.qml
+            model: roomModel
 
             delegate: RoomListItem {
                 width: parent.width
@@ -54,7 +54,6 @@ ColumnLayout {
     }
 
     Dialog {
-    // FIXME adding a room. Not rendering and modelData is not defined
         id: addRoomDialog
         title: "Add Room"
         standardButtons: StandardButton.Ok | StandardButton.Cancel
@@ -67,31 +66,8 @@ ColumnLayout {
         }
 
         onAccepted: {
-            // Call a function to add the room with the entered name
-            addRoom(roomNameField.text, []);
+            // Emit the addRoom signal with the entered room name and icon
+            roomModel.addRoom(roomNameField.text, "new-icon");
         }
-    }
-
-    // Define the roomListModel as a separate JavaScript object
-    ListModel {
-        id: roomListModel
-    }
-
-    function addRoom(roomName, devices) {
-        // Create a new JavaScript object for the room
-        var room = {
-            roomName: roomName,
-            devices: devices
-        };
-
-        // Add the room object to the model
-        roomListModel.append(room);
-    }
-
-    // Initialize the model with default rooms
-    Component.onCompleted: {
-        addRoom("Living Room", ["Device 1", "Device 2", "Device 3"]);
-        addRoom("Bedroom 1", ["Device A", "Device B", "Device C"]);
-        addRoom("Bedroom 2", ["Device X", "Device Y", "Device Z"]);
     }
 }

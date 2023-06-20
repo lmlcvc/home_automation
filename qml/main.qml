@@ -96,7 +96,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.preferredWidth: mainAppWindow.width
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
-            source: "dashboard.qml"
+            source: "settings.qml"
             onSourceChanged: {
                 buttons_rooms.visible = true
             }
@@ -129,6 +129,11 @@ ApplicationWindow {
                             icon.name: model.roomIcon
                             Layout.maximumHeight: featurebutton_control.height
                             Layout.fillHeight: true
+
+                            // Emit a signal when the room button is clicked
+                            onClicked: {
+                                roomClicked(model.roomId, model.roomName)
+                            }
                         }
                     }
                 }
@@ -136,31 +141,27 @@ ApplicationWindow {
         }
     }
 
-    ListModel {
+    RoomListModel {
         id: roomModel
-        ListElement {
-            roomName: "Living Room"
-            roomIcon: "living-room"
+        onRoomClicked: {
+            backend.roomClicked(roomId, roomName);
         }
-        ListElement {
-            roomName: "Bedroom 1"
-            roomIcon: "bedroom1"
+        onAddRoom: {
+            backend.addRoom(roomId, roomName, roomIcon);
         }
-        ListElement {
-            roomName: "Bedroom 2"
-            roomIcon: "bedroom2"
+    }
+
+    Connections {
+        target: contentLoader.item
+
+        // Connect the roomClicked signal to the appropriate slot in the backend
+        onRoomClicked: {
+            backend.roomClicked(roomId, roomName);
         }
-        ListElement {
-            roomName: "Dining Room"
-            roomIcon: "dining-room"
-        }
-        ListElement {
-            roomName: "Bathroom"
-            roomIcon: "bathroom"
-        }
-        ListElement {
-            roomName: "Garage"
-            roomIcon: "garage"
+
+        // Connect the addRoom signal to the appropriate slot in the backend
+        onAddRoom: {
+            backend.addRoom(roomId, roomName, roomIcon);
         }
     }
 }
