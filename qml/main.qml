@@ -96,47 +96,9 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.preferredWidth: mainAppWindow.width
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
-            source: "settings.qml"
+            source: "dashboard.qml"
             onSourceChanged: {
                 buttons_rooms.visible = true
-            }
-        }
-
-        // Right side buttons
-        ScrollView {
-            id: buttons_rooms
-            Layout.fillHeight: true
-
-            Container {
-                id: rightTabBar
-
-                currentIndex: 1
-
-                Layout.fillHeight: true
-
-                ButtonGroup {
-                    buttons: rightTabBarContentLayout.children
-                }
-
-                contentItem: ColumnLayout {
-                    id: rightTabBarContentLayout
-                    spacing: 3
-
-                    Repeater {
-                        model: roomModel // Bind the model to the Repeater
-                        delegate: FeatureButton {
-                            text: model.roomName
-                            icon.name: model.roomIcon
-                            Layout.maximumHeight: featurebutton_control.height
-                            Layout.fillHeight: true
-
-                            // Emit a signal when the room button is clicked
-                            onClicked: {
-                                roomClicked(model.roomId, model.roomName)
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -151,18 +113,4 @@ ApplicationWindow {
             //backend.addRoom(roomId, roomName, roomIcon);
         }
     }
-
-//    Connections {
-//        target: contentLoader.item
-//
-//        // Connect the roomClicked signal to the appropriate slot in the backend
-//        function onRoomClicked(roomId, roomName) {
-//            backend.roomClicked(roomId, roomName);
-//        }
-//
-//        // Connect the addRoom signal to the appropriate slot in the backend
-//        function onAddRoom(roomId, roomName, roomIcon) {
-//            backend.addRoom(roomId, roomName, roomIcon);
-//        }
-//    }
 }
