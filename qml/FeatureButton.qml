@@ -21,4 +21,5 @@ Button {
     icon.width: 44
     icon.height: 44
     display: Button.TextUnderIcon
+
 }
