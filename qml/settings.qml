@@ -39,12 +39,8 @@ ColumnLayout {
 
         ListView {
             id: list_rooms
-            // width: parent.width
-            // height: parent.height
-            anchors {
-                fill: parent
-                margins: 0
-            }
+            width: parent.width
+            height: parent.height
 
             model: roomModel
 
@@ -70,7 +66,7 @@ ColumnLayout {
 
         onAccepted: {
             // Emit the addRoom signal with the entered room name and icon
-            // roomModel.addRoom(roomNameField.text, "new-icon");
+            roomModel.addRoom(roomNameField.text, "new-icon");      
             roomModel.updateModel(roomNameField.text);
         }
     }

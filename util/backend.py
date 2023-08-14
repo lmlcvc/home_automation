@@ -16,7 +16,7 @@ class Backend(QObject):
         try:
             with open('./room_list.json', 'r') as file:
                 room_json = json.load(file)
-                self.room_list = [room['name'] for room in room_json]
+                self.room_list = [room['roomName'] for room in room_json]
                 print("Loaded room names:", self.room_list)
         except FileNotFoundError:
             self.room_list = []
@@ -41,13 +41,13 @@ class Backend(QObject):
             existing_rooms = json.load(file)
 
         # Find the maximum ID in the existing rooms
-        existing_ids = [room['id'] for room in existing_rooms]
+        existing_ids = [room['roomId'] for room in existing_rooms]
         next_id = max(existing_ids) + 1 if existing_ids else 0
 
         # Create a new room dictionary
         room = {
-            'id': next_id,
-            'name': room_name
+            'roomId': next_id,
+            'roomName': room_name
         }
 
         existing_rooms.append(room)
@@ -55,7 +55,22 @@ class Backend(QObject):
         with open(json_file, 'w') as file:
             json.dump(existing_rooms, file)
 
-        self.room_list = [room['name'] for room in existing_rooms]
+        self.room_list = [room['roomName'] for room in existing_rooms]
+
+    @pyqtSlot(int, str)
+    def editRoom(self, room_id, new_room_name):
+        with open('./room_list.json', 'r+') as file:
+            room_json = json.load(file)
+            
+            for room in room_json:
+                if room['roomId'] == room_id:
+                    room['roomName'] = new_room_name
+                    print("Edited room:", room)
+                    break
+
+            file.seek(0) 
+            json.dump(room_json, file, indent=4)  
+            file.truncate()
 
     @pyqtSlot(result=list)
     def loadData(self):

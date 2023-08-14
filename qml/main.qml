@@ -118,8 +118,13 @@ ApplicationWindow {
         onRoomClicked: {
             backend.roomClicked(roomId, roomName);
         }
+
         onAddRoom: {
             backend.addRoom(roomName);
+        }
+
+        onRoomEdited: {
+            backend.editRoom(roomId, newRoomName);
         }
     }
 }
