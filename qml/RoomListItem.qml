@@ -2,8 +2,9 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-Item {
-    width: parent.width // Specify the width
+Rectangle {
+    width: parent.width
+    height: 60
 
     property var itemData: {}
     property int buttonSize: 36
@@ -18,7 +19,20 @@ Item {
     property string roomName: itemData.roomName
     property var devices: itemData.devices
 
-    ColumnLayout {
+    Rectangle {
+    width: parent.width
+    height: 60
+
+    Text {
+        text: itemData.roomName // Assuming roomName is a property in itemData
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        leftPadding: 10
+        }
+    }
+
+
+    /*ColumnLayout {
         id: contentColumn
         width: parent.width
         spacing: 10
@@ -101,7 +115,7 @@ Item {
                 color: "white"
             }
         }
-    }
+    }*/
 
     // Bind itemData property to itemData in delegate item
     Binding {

@@ -39,10 +39,13 @@ ColumnLayout {
 
         ListView {
             id: list_rooms
-            width: parent.width
-            height: parent.height
+            // width: parent.width
+            // height: parent.height
+            anchors {
+                fill: parent
+                margins: 0
+            }
 
-            // Define the model as the roomModel from main.qml
             model: roomModel
 
             delegate: RoomListItem {
@@ -67,7 +70,8 @@ ColumnLayout {
 
         onAccepted: {
             // Emit the addRoom signal with the entered room name and icon
-            roomModel.addRoom(roomNameField.text, "new-icon");
+            // roomModel.addRoom(roomNameField.text, "new-icon");
+            roomModel.updateModel(roomNameField.text);
         }
     }
 }
