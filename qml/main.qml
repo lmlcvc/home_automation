@@ -103,12 +103,14 @@ ApplicationWindow {
         }
     }
 
+
+    // RoomListModel
     RoomListModel {
         id: roomModel
 
         Component.onCompleted: {
             var loadedList = backend.loadData()
-            console.log(loadedList)
+            console.log("Loaded list:", loadedList)
 
             roomModel.updateModel(loadedList)
         }
@@ -118,7 +120,6 @@ ApplicationWindow {
         }
         onAddRoom: {
             backend.addRoom(roomName);
-            //backend.addRoom(roomId, roomName, roomIcon);
         }
     }
 }

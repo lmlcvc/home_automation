@@ -16,4 +16,18 @@ ListModel {
 //        // You need to implement this according to your requirements
 //    }
 
+function updateModel(roomNames) {
+    // Clear the existing model data
+    roomListModel.clear()
+
+    // Add the loaded data to the model
+    for (var i = 0; i < roomNames.length; i++) {
+        var roomObject = {
+            roomName: roomNames[i]
+        }
+        roomListModel.append(roomObject)        
+    }
 }
+
+}
+
