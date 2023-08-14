@@ -6,6 +6,7 @@ ListModel {
     signal roomClicked(string roomId, string roomName)
     signal addRoom(string roomName, string roomIcon)        // FIXME: no room icon
     signal roomEdited(int roomId, string newRoomName)
+    signal roomDeleted(int roomId)
 
 
     function updateModel(roomNames)

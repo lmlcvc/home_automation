@@ -72,8 +72,33 @@ class Backend(QObject):
             json.dump(room_json, file, indent=4)  
             file.truncate()
 
+            self.load_room_list()
+
     @pyqtSlot(result=list)
     def loadData(self):
         self.load_room_list()
         self.dataLoaded.emit()
         return self.room_list
+    
+    @pyqtSlot(int)
+    def deleteRoom(self, room_id):
+        with open('./room_list.json', 'r+') as file:
+            room_json = json.load(file)
+
+            index_to_delete = None
+            for index, room in enumerate(room_json):
+                if room['roomId'] == room_id:
+                    index_to_delete = index
+                    break
+
+            if index_to_delete is not None:
+                del room_json[index_to_delete]
+                print("Deleted room with ID:", room_id)
+
+                file.seek(0)
+                json.dump(room_json, file, indent=4)
+                file.truncate()
+
+                self.load_room_list()
+            else:
+                print("Room with ID", room_id, "not found.")

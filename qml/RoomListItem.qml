@@ -70,7 +70,8 @@ Item {
                     icon.source: "../images/delete.png"
                     Layout.alignment: Qt.AlignRight
                     onClicked: {
-                        // Handle delete button clicked
+                        deleteRoomDialog.roomName = roomName;
+                        deleteRoomDialog.open();
                     }
                 }
 
@@ -109,14 +110,34 @@ Item {
 
             onAccepted: {
                 roomModel.roomEdited(itemData.roomId, newRoomNameField.text);
-                roomModel.updateModel(newRoomNameField.text);
+            }
+        }
+
+        Dialog {
+            id: deleteRoomDialog
+            title: "Delete Room" 
+            standardButtons: StandardButton.Ok | StandardButton.Cancel
+
+            width: 300
+            height: 100 
+
+            property string roomName: ""
+
+            ColumnLayout {
+                Text {
+                    text: "Delete " + roomName + "?"
+                }
+            }
+
+            onAccepted: {
+                roomModel.roomDeleted(itemData.roomId);
             }
         }
 
 
         Rectangle {
             width: parent.width
-            height: 20 // Adjust the spacing as needed
+            height: 20 
             color: "transparent"
         }
 
@@ -127,7 +148,7 @@ Item {
             model: devices
 
             delegate: Text {
-                text: modelData // Display the actual item from the device list
+                text: modelData 
                 color: "white"
             }
         }

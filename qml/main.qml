@@ -111,7 +111,6 @@ ApplicationWindow {
         Component.onCompleted: {
             var loadedList = backend.loadData()
             console.log("Loaded list:", loadedList)
-
             roomModel.updateModel(loadedList)
         }
 
@@ -121,10 +120,26 @@ ApplicationWindow {
 
         onAddRoom: {
             backend.addRoom(roomName);
+
+            var loadedList = backend.loadData();
+            console.log("Loaded list:", loadedList);
+            roomModel.updateModel(loadedList);
         }
 
         onRoomEdited: {
             backend.editRoom(roomId, newRoomName);
+
+            var loadedList = backend.loadData();
+            console.log("Loaded list:", loadedList);
+            roomModel.updateModel(loadedList);
+        }
+
+        onRoomDeleted: {
+            backend.deleteRoom(roomId);
+
+            var loadedList = backend.loadData();
+            console.log("Loaded list:", loadedList);
+            roomModel.updateModel(loadedList);
         }
     }
 }
