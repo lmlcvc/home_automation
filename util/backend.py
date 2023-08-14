@@ -28,6 +28,11 @@ class Backend(QObject):
         with open('./room_list.json', 'w+') as file:
             json.dump(self.room_list, file)
 
+    def getRoomIds(self):
+        with open('./room_list.json', 'r') as file:
+            room_json = json.load(file)
+        return [room['roomId'] for room in room_json]
+
     @pyqtSlot(str)
     def addRoom(self, room_name):
         json_file = 'room_list.json'

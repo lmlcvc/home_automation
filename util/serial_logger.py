@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+
 import serial
 from util.serial_thread import SerialThread
 
@@ -52,14 +53,18 @@ def is_valid_value(measurement, value):
 
 
 class SerialLogger:
-    def __init__(self):
-        self.serial_port = serial.Serial('COM1', 9600)  # Replace 'COM1' with the appropriate serial port
-        self.send_message(f"{datetime.now()} - serial connected\n")
+    def __init__(self, backend):
+        self.backend = backend
+
+        # TODO: Redo or remove serial port init
+        self.serial_port = None  # serial.Serial('/dev/ttyUSB0', 9600)
+        # self.send_message(f"{datetime.now()} - serial connected\n")
+
         self.log_dir = 'logs'
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
 
-        self.serial_thread = SerialThread(self.serial_port)
+        self.serial_thread = SerialThread(self.serial_port, self.backend)
         self.serial_thread.messageReceived.connect(self.handle_serial_message)
         self.serial_thread.start()
 
@@ -102,10 +107,13 @@ class SerialLogger:
             'C': 'power_consumption'
         }
         measurement_name = measurement_names[measurement]
-        log_dir = os.path.join(os.getcwd(), self.log_dir, room_id)  # Use absolute path for log directory
-        log_file = os.path.join(log_dir, f"{measurement_name}.log")  # Use absolute path for log file
+        # Use absolute path for log directory
+        log_dir = os.path.join(os.getcwd(), self.log_dir, room_id)
+        # Use absolute path for log file
+        log_file = os.path.join(log_dir, f"{measurement_name}.log")
 
-        os.makedirs(log_dir, exist_ok=True)  # Create the log directory if it doesn't exist
+        # Create the log directory if it doesn't exist
+        os.makedirs(log_dir, exist_ok=True)
 
         timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
         log_entry = f"{timestamp}, {measurement}, {value}\n"
@@ -120,10 +128,13 @@ class SerialLogger:
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         log_entry = f"{timestamp}, ERROR: {message}\n"
 
-        log_dir = os.path.join(os.getcwd(), self.log_dir, room_id)  # Use absolute path for log directory
-        os.makedirs(log_dir, exist_ok=True)  # Create the log directory if it doesn't exist
+        # Use absolute path for log directory
+        log_dir = os.path.join(os.getcwd(), self.log_dir, room_id)
+        # Create the log directory if it doesn't exist
+        os.makedirs(log_dir, exist_ok=True)
 
-        log_file = os.path.join(log_dir, "error.log")  # Use absolute path for error log
+        # Use absolute path for error log
+        log_file = os.path.join(log_dir, "error.log")
 
         with open(log_file, 'a') as file:  # Open the error log file in append mode
             file.write(log_entry)
