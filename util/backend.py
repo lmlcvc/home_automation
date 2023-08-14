@@ -16,8 +16,7 @@ class Backend(QObject):
         try:
             with open('./room_list.json', 'r') as file:
                 room_json = json.load(file)
-                self.room_list = [room['roomName'] for room in room_json]
-                print("Loaded room names:", self.room_list)
+                self.room_list = [room for room in room_json]
         except FileNotFoundError:
             self.room_list = []
             print("Room list file not found.")
@@ -33,7 +32,6 @@ class Backend(QObject):
             room_json = json.load(file)
         return [room['roomId'] for room in room_json]
 
-    @pyqtSlot(str)
     @pyqtSlot(str)
     def addRoom(self, room_name):
         json_file = 'room_list.json'

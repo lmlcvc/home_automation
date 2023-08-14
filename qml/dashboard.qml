@@ -100,7 +100,7 @@ RowLayout {
                     model: backend.loadData() // Bind the model to the Repeater
                     delegate: Button {
                         property int roomId: index // Assign the index as the roomId
-                        property string roomName: modelData // Assign the modelData as the roomName
+                        property string roomName: modelData.roomName // Assign the modelData as the roomName
 
                         text: roomName // Display the room name
                         Layout.maximumHeight: featurebutton_control.height

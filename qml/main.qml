@@ -104,13 +104,11 @@ ApplicationWindow {
     }
 
 
-    // RoomListModel
     RoomListModel {
         id: roomModel
 
         Component.onCompleted: {
             var loadedList = backend.loadData()
-            console.log("Loaded list:", loadedList)
             roomModel.updateModel(loadedList)
         }
 

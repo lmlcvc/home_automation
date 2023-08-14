@@ -152,18 +152,23 @@ Item {
         }
 
         Dialog {
+            // FIXME: make devices list scrollable
+            // FIXME: align delete button to right
+            // TODO: limit max. device name length
             id: manageRoomDevicesDialog
             title: "Manage Devices"
             standardButtons: StandardButton.Ok | StandardButton.Cancel
 
-            width: 300
-            height: 100
+            width: 400
+            height: 400
 
             property string roomName: ""
             property string deviceName: ""
-            
+           
 
             ColumnLayout {
+                spacing: 10
+
                 Text {
                     text: "Enter new device for " + roomName
                 }
@@ -178,11 +183,42 @@ Item {
                     model: ["temperature", "humidity", "air pressure", "brightness", "power consumption"]
                     currentIndex: measurementComboBox.model.indexOf(selectedMeasurement)
                 }
+
+                ListView {
+                    id: deviceListView
+                    width: parent.width
+                    height: 200
+                    // Layout.fillHeight: true
+
+                    model: devices
+
+                    delegate: Item {
+                        width: parent.width
+                        height: 36
+
+                        RowLayout {
+                            Text {
+                                text: model.name
+                            }
+
+                            Text {
+                                text: "(" + model.measurement + ")"
+                            }
+
+                            Button {
+                                text: "Delete"
+                                onClicked: {
+                                    devices.remove(index, 1);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             onAccepted: {
                 var newDevice = {
-                    deviceName: newDeviceNameField.text,
+                    name: newDeviceNameField.text,
                     measurement: measurementComboBox.currentText
                 }
                 devices.push(newDevice)
@@ -197,16 +233,16 @@ Item {
             color: "transparent"
         }
 
-        ListView {
+        /*ListView {
             id: deviceListView
             width: parent.width
             visible: false // Start with the device list hidden
             model: devices
 
             delegate: Text {
-                text: modelData 
+                text: itemData.devices.name 
                 color: "white"
             }
-        }
+        }*/
     }
 }
