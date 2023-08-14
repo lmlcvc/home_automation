@@ -4,7 +4,7 @@ ListModel {
     id: roomListModel
 
     signal roomClicked(string roomId, string roomName)
-    signal addRoom(string roomName, string roomIcon)        // FIXME: no room icon
+    signal addRoom(string roomName, var devices)
     signal roomEdited(int roomId, string newRoomName)
     signal roomDeleted(int roomId)
 

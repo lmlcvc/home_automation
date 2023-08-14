@@ -34,47 +34,39 @@ class Backend(QObject):
         return [room['roomId'] for room in room_json]
 
     @pyqtSlot(str)
+    @pyqtSlot(str)
     def addRoom(self, room_name):
         json_file = 'room_list.json'
         if not os.path.exists(json_file):
-            # Create an empty room list if the file doesn't exist
             with open(json_file, 'w') as file:
                 json.dump([], file)
 
-        # Load existing room list from JSON file
-        with open(json_file, 'r') as file:
-            existing_rooms = json.load(file)
-
-        # Find the maximum ID in the existing rooms
-        existing_ids = [room['roomId'] for room in existing_rooms]
+        existing_ids = [room['roomId'] for room in self.room_list]
         next_id = max(existing_ids) + 1 if existing_ids else 0
 
-        # Create a new room dictionary
-        room = {
+        new_room = {
             'roomId': next_id,
-            'roomName': room_name
+            'roomName': room_name,
+            'devices': []  # Initialize with an empty devices list
         }
 
-        existing_rooms.append(room)
-
-        with open(json_file, 'w') as file:
-            json.dump(existing_rooms, file)
-
-        self.room_list = [room['roomName'] for room in existing_rooms]
+        self.room_list.append(new_room)
+        self.save_room_list()
+        self.load_room_list()
 
     @pyqtSlot(int, str)
     def editRoom(self, room_id, new_room_name):
         with open('./room_list.json', 'r+') as file:
             room_json = json.load(file)
-            
+
             for room in room_json:
                 if room['roomId'] == room_id:
                     room['roomName'] = new_room_name
                     print("Edited room:", room)
                     break
 
-            file.seek(0) 
-            json.dump(room_json, file, indent=4)  
+            file.seek(0)
+            json.dump(room_json, file, indent=4)
             file.truncate()
 
             self.load_room_list()
@@ -84,7 +76,7 @@ class Backend(QObject):
         self.load_room_list()
         self.dataLoaded.emit()
         return self.room_list
-    
+
     @pyqtSlot(int)
     def deleteRoom(self, room_id):
         with open('./room_list.json', 'r+') as file:

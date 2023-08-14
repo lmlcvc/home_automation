@@ -12,6 +12,7 @@ Item {
 
     property string roomName: itemData.roomName
     property var devices: itemData.devices
+    property string selectedMeasurement: "temperature" // Default measurement
 
     Rectangle {
         id: background
@@ -76,6 +77,22 @@ Item {
                 }
 
                 Button {
+                    id: button_manage
+                    width: buttonSize
+                    height: buttonSize
+                    implicitWidth: width
+                    implicitHeight: height
+                    icon.width: width
+                    icon.height: height
+                    icon.source: "../images/add.png"        // TODO: some other img
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        manageRoomDevicesDialog.roomName = roomName;
+                        manageRoomDevicesDialog.open();
+                    }
+                }
+
+                Button {
                     id: button_expand
                     width: buttonSize
                     height: buttonSize
@@ -131,6 +148,45 @@ Item {
 
             onAccepted: {
                 roomModel.roomDeleted(itemData.roomId);
+            }
+        }
+
+        Dialog {
+            id: manageRoomDevicesDialog
+            title: "Manage Devices"
+            standardButtons: StandardButton.Ok | StandardButton.Cancel
+
+            width: 300
+            height: 100
+
+            property string roomName: ""
+            property string deviceName: ""
+            
+
+            ColumnLayout {
+                Text {
+                    text: "Enter new device for " + roomName
+                }
+
+                TextField {
+                    id: newDeviceNameField
+                    placeholderText: "Enter new device name"
+                }
+
+                ComboBox {
+                    id: measurementComboBox
+                    model: ["temperature", "humidity", "air pressure", "brightness", "power consumption"]
+                    currentIndex: measurementComboBox.model.indexOf(selectedMeasurement)
+                }
+            }
+
+            onAccepted: {
+                var newDevice = {
+                    deviceName: newDeviceNameField.text,
+                    measurement: measurementComboBox.currentText
+                }
+                devices.push(newDevice)
+                // TODO: Update backend with the new device information
             }
         }
 
