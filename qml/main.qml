@@ -84,7 +84,6 @@ ApplicationWindow {
 
                     onClicked: {
                         contentLoader.source = "settings.qml"
-                        buttons_rooms.visible = false
                     }
                 }
             }
@@ -97,9 +96,6 @@ ApplicationWindow {
             Layout.preferredWidth: mainAppWindow.width
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
             source: "dashboard.qml"
-            onSourceChanged: {
-                buttons_rooms.visible = true
-            }
         }
     }
 

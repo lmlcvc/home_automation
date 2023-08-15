@@ -3,6 +3,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 RowLayout {
+    id: dashboardWindow
+
     anchors.fill: parent
     spacing: 10
 
@@ -74,7 +76,6 @@ RowLayout {
     ScrollView {
         id: buttons_rooms
         Layout.fillHeight: true
-        visible: false  // Initially hidden
 
         Container {
             id: rightTabBar
@@ -97,7 +98,8 @@ RowLayout {
                 }
 
                 Repeater {
-                    model: backend.loadData() // Bind the model to the Repeater
+                    // TODO: model should be model from main
+                    model: dashboardWindow.backend.loadData() // Bind the model to the Repeater
                     delegate: Button {
                         property int roomId: index // Assign the index as the roomId
                         property string roomName: modelData.roomName // Assign the modelData as the roomName
