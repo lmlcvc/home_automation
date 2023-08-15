@@ -158,7 +158,7 @@ Item {
             title: "Manage Devices"
             standardButtons: StandardButton.Ok | StandardButton.Cancel
 
-            width: 400
+            width: 500
             height: 400
 
             property string roomName: ""
@@ -177,45 +177,54 @@ Item {
                     }
                 }
 
-                ListView {
-                    id: deviceListView
-                    width: parent.width
-                    height: 200
-                    // Layout.fillHeight: true
+                ScrollView{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-                    model: manageRoomDevicesDialog.displayedDevices
-
-                    delegate: Item {
+                    ListView {
+                        id: deviceListView
                         width: parent.width
-                        height: 36
+                        height: 300
 
-                        RowLayout {
+                        model: manageRoomDevicesDialog.displayedDevices
+
+                        delegate: RowLayout {
+                            width: parent.width
+                            height: 40
+
                             Text {
-                                text: model.name
+                                Layout.alignment: Qt.AlignLeft
+                                text: model.name + " (" + model.measurement + ")"
                             }
 
-                            Text {
-                                text: "(" + model.measurement + ")"
-                            }
 
-                            Button {
-                                text: "Delete"
-                                onClicked: {
-                                    var deviceToDelete = model.name; 
-                                    manageRoomDevicesDialog.devicesToRemove.push({ roomId: roomId, name: deviceToDelete });
+                            // TODO: edit device implementation
 
-                                    // Remove the device from the displayedDevices list
-                                    for (var i = 0; i < manageRoomDevicesDialog.displayedDevices.count; i++) {
-                                        if (manageRoomDevicesDialog.displayedDevices.get(i).name === deviceToDelete) {
-                                            manageRoomDevicesDialog.displayedDevices.remove(i);
-                                            break;
+                            Item{
+                                Layout.fillWidth: true
+                                height: buttonDelete.implicitHeight
+
+                                Button {
+                                    id: buttonDelete
+                                    text: "Delete"
+                                    
+                                    onClicked: {
+                                        var deviceToDelete = model.name; 
+                                        manageRoomDevicesDialog.devicesToRemove.push({ roomId: roomId, name: deviceToDelete });
+
+                                        // Remove the device from the displayedDevices list
+                                        for (var i = 0; i < manageRoomDevicesDialog.displayedDevices.count; i++) {
+                                            if (manageRoomDevicesDialog.displayedDevices.get(i).name === deviceToDelete) {
+                                                manageRoomDevicesDialog.displayedDevices.remove(i);
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
+                }    
             }
 
             onAccepted: {
