@@ -3,9 +3,6 @@ import os
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
-# TODO: implement function for adding device based on room ID
-# TODO: implement function for editing device name based on room ID and current name
-
 
 class Backend(QObject):
     dataLoaded = pyqtSignal()  # Signal to notify QML about data loading
@@ -125,7 +122,8 @@ class Backend(QObject):
         for room in self.room_list:
             if room['roomId'] == room_id:
                 devices = room['devices']
-                updated_devices = [device for device in devices if device['name'] != device_name]
+                updated_devices = [
+                    device for device in devices if device['name'] != device_name]
                 print(f"Updated devices:\n{updated_devices}")
 
                 room['devices'] = updated_devices
@@ -135,5 +133,12 @@ class Backend(QObject):
                 return
         print("Invalid room ID:", room_id)
 
-
-
+    @pyqtSlot(int, list)
+    def updateDevices(self, room_id, new_devices):
+        for room in self.room_list:
+            if room['roomId'] == room_id:
+                room['devices'] = new_devices
+                self.save_room_list()
+                break
+        else:
+            print("Invalid room ID:", room_id)

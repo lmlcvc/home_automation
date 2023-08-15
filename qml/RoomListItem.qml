@@ -154,7 +154,6 @@ Item {
         Dialog {
             // FIXME: make devices list scrollable
             // FIXME: align delete button to right
-            // TODO: limit max. device name length
             id: manageRoomDevicesDialog
             title: "Manage Devices"
             standardButtons: StandardButton.Ok | StandardButton.Cancel
@@ -167,22 +166,15 @@ Item {
             property var devicesToRemove: []
             property var displayedDevices: devices
 
+
             ColumnLayout {
                 spacing: 10
 
-                Text {
-                    text: "Enter new device for " + roomName
-                }
-
-                TextField {
-                    id: newDeviceNameField
-                    placeholderText: "Enter new device name"
-                }
-
-                ComboBox {
-                    id: measurementComboBox
-                    model: ["temperature", "humidity", "air pressure", "brightness", "power consumption"]
-                    currentIndex: measurementComboBox.model.indexOf(selectedMeasurement)
+                Button {
+                    text: "Add Device"
+                    onClicked: {
+                        addDeviceDialog.open();
+                    }
                 }
 
                 ListView {
@@ -209,7 +201,7 @@ Item {
                             Button {
                                 text: "Delete"
                                 onClicked: {
-                                    var deviceToDelete = model.name; // Store the name of the device to delete
+                                    var deviceToDelete = model.name; 
                                     manageRoomDevicesDialog.devicesToRemove.push({ roomId: roomId, name: deviceToDelete });
 
                                     // Remove the device from the displayedDevices list
@@ -227,37 +219,84 @@ Item {
             }
 
             onAccepted: {
-                if (newDeviceNameField.text.trim() !== "") {
-                    var newDevice = {
-                        name: newDeviceNameField.text,
-                        measurement: measurementComboBox.currentText
-                    };
-                    roomModel.deviceAdded(itemData.roomId, newDevice.name, newDevice.measurement);
+                var updatedDevices = [];
+
+                // Copy the devices from the displayedDevices list
+                for (var i = 0; i < manageRoomDevicesDialog.displayedDevices.count; i++) {
+                    updatedDevices.push({
+                        name: manageRoomDevicesDialog.displayedDevices.get(i).name,
+                        measurement: manageRoomDevicesDialog.displayedDevices.get(i).measurement
+                    });
+                }
+                roomModel.devicesUpdated(itemData.roomId, updatedDevices);
+                // XXX: Only emit the signal if there were changes
+                // for example introduce a changesOccurred boolean to the dialog that will be set to true on any deviceList update
+            }
+
+            Dialog {
+                id: addDeviceDialog
+                title: "Add Device"
+                standardButtons: StandardButton.Ok | StandardButton.Cancel
+
+                property string newDeviceName: ""
+                property string newDeviceMeasurement: "temperature" // Default measurement
+
+                Dialog {
+                    id: errorMessageDialog
+                    title: "Error"
+                    standardButtons: StandardButton.Ok
+
+                    ColumnLayout {
+                        Text {
+                            id: errorMessageText
+                        }
+                    }
                 }
 
-                for (var i = 0; i < devicesToRemove.length; i++) {
-                    roomModel.deviceRemoved(manageRoomDevicesDialog.devicesToRemove[i].roomId, manageRoomDevicesDialog.devicesToRemove[i].name);
+                function showErrorMessage(message) {
+                    errorMessageText.text = message;
+                    errorMessageDialog.open();
+                }
+
+                ColumnLayout {
+                    spacing: 10
+
+                    TextField {
+                        id: newDeviceNameField
+                        placeholderText: "Enter new device name"
+                        onTextChanged: {
+                            if (newDeviceNameField.text.length > 30) {
+                                newDeviceNameField.text = newDeviceNameField.text.substring(0, 30);
+                            }
+                        }
+                    }
+
+                    ComboBox {
+                        id: measurementComboBox
+                        model: ["temperature", "humidity", "air pressure", "brightness", "power consumption"]
+                        currentIndex: measurementComboBox.model.indexOf(addDeviceDialog.newDeviceMeasurement)
+                    }
+                }
+
+                onAccepted: {
+                    var dialogDisplayedDevices = Array.from(manageRoomDevicesDialog.displayedDevices);
+                    newDeviceName = newDeviceNameField.text;
+                    newDeviceMeasurement = measurementComboBox.currentText;
+
+                    if (newDeviceName.trim() === "") {
+                        showErrorMessage("Device name must not be empty.");
+                    } else if (dialogDisplayedDevices.some(function(device) { return device.name.toLowerCase() == newDeviceName.toLowerCase(); })) {  // FIXME: always false
+                        showErrorMessage("Device name already exists in this room.");
+                    } else {
+                        var newDevice = {
+                            name: newDeviceName,
+                            measurement: newDeviceMeasurement
+                        };
+                        manageRoomDevicesDialog.displayedDevices.append(newDevice);
+                    }
+                    newDeviceNameField.text = "";
                 }
             }
         }
-
-
-        Rectangle {
-            width: parent.width
-            height: 20 
-            color: "transparent"
-        }
-
-        /*ListView {
-            id: deviceListView
-            width: parent.width
-            visible: false // Start with the device list hidden
-            model: devices
-
-            delegate: Text {
-                text: itemData.devices.name 
-                color: "white"
-            }
-        }*/
     }
 }

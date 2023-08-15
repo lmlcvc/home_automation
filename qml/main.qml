@@ -140,5 +140,10 @@ ApplicationWindow {
             backend.removeDevice(roomId, deviceName);
             updateModelAfterAction();
         }
+
+        onDevicesUpdated: {
+            backend.updateDevices(roomId, devices);
+            updateModelAfterAction();
+        }
     }
 }
