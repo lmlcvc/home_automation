@@ -221,8 +221,9 @@ Item {
                     name: newDeviceNameField.text,
                     measurement: measurementComboBox.currentText
                 }
-                devices.push(newDevice)
+                //devices.append(newDevice);
                 // TODO: Update backend with the new device information
+                roomModel.deviceAdded(itemData.roomId, newDevice.name, newDevice.measurement);
             }
         }
 

@@ -107,20 +107,16 @@ ApplicationWindow {
     RoomListModel {
         id: roomModel
 
+        // TODO: make this update a reset function
         Component.onCompleted: {
             var loadedList = backend.loadData()
             roomModel.updateModel(loadedList)
-        }
-
-        onRoomClicked: {
-            backend.roomClicked(roomId, roomName);
         }
 
         onAddRoom: {
             backend.addRoom(roomName);
 
             var loadedList = backend.loadData();
-            console.log("Loaded list:", loadedList);
             roomModel.updateModel(loadedList);
         }
 
@@ -128,7 +124,6 @@ ApplicationWindow {
             backend.editRoom(roomId, newRoomName);
 
             var loadedList = backend.loadData();
-            console.log("Loaded list:", loadedList);
             roomModel.updateModel(loadedList);
         }
 
@@ -136,7 +131,13 @@ ApplicationWindow {
             backend.deleteRoom(roomId);
 
             var loadedList = backend.loadData();
-            console.log("Loaded list:", loadedList);
+            roomModel.updateModel(loadedList);
+        }
+
+        onDeviceAdded: {
+            backend.addDevice(roomId, deviceName, measurement);
+
+            var loadedList = backend.loadData();
             roomModel.updateModel(loadedList);
         }
     }

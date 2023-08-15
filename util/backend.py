@@ -3,6 +3,9 @@ import os
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
+# TODO: implement function for adding device based on room ID
+# TODO: implement function for editing device name based on room ID and current name
+
 
 class Backend(QObject):
     dataLoaded = pyqtSignal()  # Signal to notify QML about data loading
@@ -97,3 +100,23 @@ class Backend(QObject):
                 self.load_room_list()
             else:
                 print("Room with ID", room_id, "not found.")
+
+    @pyqtSlot(int, str, str)
+    def addDevice(self, room_id, device_name, measurement):
+        found = False
+        for room in self.room_list:
+            if room['roomId'] == room_id:
+                new_device = {
+                    'name': device_name,
+                    'measurement': measurement
+                }
+                room['devices'].append(new_device)
+                self.save_room_list()
+
+                self.load_room_list()
+                print(self.load_room_list())
+                found = True
+                break
+
+        if not found:
+            print("Invalid room ID:", room_id)
