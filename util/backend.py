@@ -29,6 +29,7 @@ class Backend(QObject):
     def save_room_list(self):
         with open('./room_list.json', 'w+') as file:
             json.dump(self.room_list, file)
+        self.load_room_list()
 
     def getRoomIds(self):
         with open('./room_list.json', 'r') as file:
@@ -53,7 +54,6 @@ class Backend(QObject):
 
         self.room_list.append(new_room)
         self.save_room_list()
-        self.load_room_list()
 
     @pyqtSlot(int, str)
     def editRoom(self, room_id, new_room_name):
@@ -113,10 +113,27 @@ class Backend(QObject):
                 room['devices'].append(new_device)
                 self.save_room_list()
 
-                self.load_room_list()
-                print(self.load_room_list())
                 found = True
                 break
 
         if not found:
             print("Invalid room ID:", room_id)
+
+    @pyqtSlot(int, str)
+    def removeDevice(self, room_id, device_name):
+        print(room_id, device_name)
+        for room in self.room_list:
+            if room['roomId'] == room_id:
+                devices = room['devices']
+                updated_devices = [device for device in devices if device['name'] != device_name]
+                print(f"Updated devices:\n{updated_devices}")
+
+                room['devices'] = updated_devices
+                print(f"Room[devices]:\n{room['devices']}")
+
+                self.save_room_list()
+                return
+        print("Invalid room ID:", room_id)
+
+
+

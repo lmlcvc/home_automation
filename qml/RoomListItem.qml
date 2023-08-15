@@ -164,7 +164,8 @@ Item {
 
             property string roomName: ""
             property string deviceName: ""
-           
+            property var devicesToRemove: []
+            property var displayedDevices: devices
 
             ColumnLayout {
                 spacing: 10
@@ -190,7 +191,7 @@ Item {
                     height: 200
                     // Layout.fillHeight: true
 
-                    model: devices
+                    model: manageRoomDevicesDialog.displayedDevices
 
                     delegate: Item {
                         width: parent.width
@@ -208,7 +209,16 @@ Item {
                             Button {
                                 text: "Delete"
                                 onClicked: {
-                                    devices.remove(index, 1);
+                                    var deviceToDelete = model.name; // Store the name of the device to delete
+                                    manageRoomDevicesDialog.devicesToRemove.push({ roomId: roomId, name: deviceToDelete });
+
+                                    // Remove the device from the displayedDevices list
+                                    for (var i = 0; i < manageRoomDevicesDialog.displayedDevices.count; i++) {
+                                        if (manageRoomDevicesDialog.displayedDevices.get(i).name === deviceToDelete) {
+                                            manageRoomDevicesDialog.displayedDevices.remove(i);
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -217,13 +227,17 @@ Item {
             }
 
             onAccepted: {
-                var newDevice = {
-                    name: newDeviceNameField.text,
-                    measurement: measurementComboBox.currentText
+                if (newDeviceNameField.text.trim() !== "") {
+                    var newDevice = {
+                        name: newDeviceNameField.text,
+                        measurement: measurementComboBox.currentText
+                    };
+                    roomModel.deviceAdded(itemData.roomId, newDevice.name, newDevice.measurement);
                 }
-                //devices.append(newDevice);
-                // TODO: Update backend with the new device information
-                roomModel.deviceAdded(itemData.roomId, newDevice.name, newDevice.measurement);
+
+                for (var i = 0; i < devicesToRemove.length; i++) {
+                    roomModel.deviceRemoved(manageRoomDevicesDialog.devicesToRemove[i].roomId, manageRoomDevicesDialog.devicesToRemove[i].name);
+                }
             }
         }
 

@@ -107,38 +107,38 @@ ApplicationWindow {
     RoomListModel {
         id: roomModel
 
-        // TODO: make this update a reset function
+        function updateModelAfterAction() {
+            var loadedList = backend.loadData();
+            roomModel.updateModel(loadedList);
+        }
+
         Component.onCompleted: {
-            var loadedList = backend.loadData()
-            roomModel.updateModel(loadedList)
+            updateModelAfterAction();
         }
 
         onAddRoom: {
             backend.addRoom(roomName);
-
-            var loadedList = backend.loadData();
-            roomModel.updateModel(loadedList);
+            updateModelAfterAction();
         }
 
         onRoomEdited: {
             backend.editRoom(roomId, newRoomName);
-
-            var loadedList = backend.loadData();
-            roomModel.updateModel(loadedList);
+            updateModelAfterAction();
         }
 
         onRoomDeleted: {
             backend.deleteRoom(roomId);
-
-            var loadedList = backend.loadData();
-            roomModel.updateModel(loadedList);
+            updateModelAfterAction();
         }
 
         onDeviceAdded: {
             backend.addDevice(roomId, deviceName, measurement);
+            updateModelAfterAction();
+        }
 
-            var loadedList = backend.loadData();
-            roomModel.updateModel(loadedList);
+        onDeviceRemoved: {
+            backend.removeDevice(roomId, deviceName);
+            updateModelAfterAction();
         }
     }
 }

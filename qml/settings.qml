@@ -65,9 +65,7 @@ ColumnLayout {
         }
 
         onAccepted: {
-            // Emit the addRoom signal with the entered room name and empty list of devices
             roomModel.addRoom(roomNameField.text, []);      
-            roomModel.updateModel(roomNameField.text);
         }
     }
 }

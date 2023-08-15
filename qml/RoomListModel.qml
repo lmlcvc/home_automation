@@ -8,6 +8,7 @@ ListModel {
     signal roomDeleted(int roomId)
 
     signal deviceAdded(int roomId, string deviceName, string measurement)
+    signal deviceRemoved(int roomId, string deviceName)
 
     function updateModel(roomObjects)
     {
