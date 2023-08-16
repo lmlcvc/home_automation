@@ -33,24 +33,20 @@ ColumnLayout {
         }
     }
 
-    Item {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
+    ListView {
+        id: list_rooms
+        width: parent.width
+        height: parent.height
 
-        ListView {
-            id: list_rooms
+        model: roomModel
+
+        delegate: RoomListItem {
             width: parent.width
-            height: parent.height
-
-            model: roomModel
-
-            delegate: RoomListItem {
-                width: parent.width
-                height: 60
-                itemData: model
-            }
+            height: 60
+            itemData: model
         }
     }
+
 
     Dialog {
         id: addRoomDialog
@@ -65,7 +61,7 @@ ColumnLayout {
         }
 
         onAccepted: {
-            roomModel.addRoom(roomNameField.text, []);      
+            roomModel.addRoom(roomNameField.text, []);
         }
     }
 }
