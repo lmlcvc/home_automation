@@ -27,7 +27,7 @@ Item {
 
             Text {
                 text: measurementValue
-                color: "lightgreen"
+                color: measurementValue.toLowerCase().includes("err") ? "red" : "lightgreen"
             }
         }
     }

@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
+
 RowLayout {
     id: dashboardWindow
 
@@ -10,31 +11,36 @@ RowLayout {
 
     property int currentRoomId: 0
 
-        // AC control and current values
-        ColumnLayout {
-            spacing: 10
-            Layout.alignment: Qt.AlignTop
+    signal dashboardCurrentRoomIdChanged(int roomId)
+    onDashboardCurrentRoomIdChanged: {
+        measurementModel.updateMeasurements(dashboardWindow.currentRoomId);
+    }
 
-            Switch {
-                id: acSwitch
-                text: "AC"
-            }
+    // AC control and current values
+    ColumnLayout {
+        spacing: 10
+        Layout.alignment: Qt.AlignTop
 
-            ListView {
-                id: currentValues
-                
+        Switch {
+            id: acSwitch
+            text: "AC"
+        }
+
+        ListView {
+            id: currentValues
+            
+            width: parent.width
+            Layout.fillHeight: true
+
+            model: measurementModel
+
+            delegate: MeasurementListItem {
                 width: parent.width
-                Layout.fillHeight: true
-
-                model: measurementModel
-
-                delegate: MeasurementListItem {
-                    width: parent.width
-                    height: 40
-                    itemData: model
-                }
+                height: 40
+                itemData: model
             }
         }
+    }
 
         // Graphs
         ColumnLayout {
@@ -107,10 +113,12 @@ RowLayout {
                 }
 
                 // Emit a signal when the room button is clicked
-                onClicked: {
-                    console.log(dashboardWindow.height, roomModel.count)
-                    backend.roomClicked(roomId, roomName);
+                onClicked: {       
+                    console.log(dashboardWindow.height, roomModel.count, model.roomName);
+                    // backend.roomClicked(model.roomId, model.roomName);
+
                     dashboardWindow.currentRoomId = model.roomId;
+                    dashboardCurrentRoomIdChanged(roomModel.roomId);
                 }
             }
         }

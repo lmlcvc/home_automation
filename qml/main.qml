@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
+
 ApplicationWindow {
     id: mainAppWindow
 
@@ -146,18 +147,18 @@ ApplicationWindow {
     MesurementListModel {
         id: measurementModel
 
-        function updateModelAfterAction() {
-            var loadedList = backend.loadMeasurements(roomId);
+        function updateMeasurements() {
+            var loadedList = backend.loadMeasurements(currentRoomId);
             measurementModel.updateModel(loadedList);
         }
 
         Component.onCompleted: {
-            updateModelAfterAction();
+            updateMeasurements();
         }
 
         onMeasurementUpdated: {
             backend.updateMeasurement(roomId, measurementName, measurementValue);
-            updateModelAfterAction();
+            updateMeasurements();
         }
     }
 }

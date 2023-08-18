@@ -18,7 +18,7 @@ ListModel {
         roomListModel.clear()
 
         for (var i = 0; i < roomObjects.length; i++) {
-            roomListModel.append(roomObjects[i])
+            roomListModel.append([i])
         }
     }
 }

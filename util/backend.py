@@ -143,23 +143,42 @@ class Backend(QObject):
         else:
             print("Invalid room ID:", room_id)
 
-    def getLastValueFromFile(self, room_id, measurement, device_name):
-        # Load the log file data for the room
-        log_file_path = f"./logs/{room_id}_{device_name}.log"
-        if os.path.exists(log_file_path):
-            with open(log_file_path, 'r') as log_file:
-                lines = log_file.readlines()
-                for line in reversed(lines):
-                    timestamp, value = line.strip().split(', ')
-                    if measurement == 'Temperature':
-                        return f"{value}°C" if value != 'ERR' else "Error"
-                    elif measurement == 'Humidity':
-                        return f"{value}%" if value != 'ERR' else "Error"
-                    elif measurement == 'Air Pressure':
-                        return f"{value} hPa" if value != 'ERR' else "Error"
-            return "UNKNOWN"
-        return "UNKNOWN"
+    @pyqtSlot(int, result=list)
+    def loadMeasurements(self, currentRoomId):
+        # TODO: add measurement units
+        # TODO: if measurement is too old, append "UNKNOWN" instead of value
+        measurement_files = [
+            filename for filename in os.listdir(f"./logs/{currentRoomId}")
+        ]
+        measurements = []
 
-    @pyqtSlot(result=list)
-    def loadMeasurements(self, roomId):
-        return [{"name": "temperature", "value": "69"}]
+        for measurement_file in measurement_files:
+            log_file_path = f"./logs/{currentRoomId}/{measurement_file}"
+
+            if os.path.exists(log_file_path):
+                with open(log_file_path, 'r') as log_file:
+                    lines = log_file.readlines()
+                    for line in reversed(lines):
+                        _, value = line.strip().split(', ')
+
+                        if 'err' not in value.lower():
+                            measurements.append({
+                                "name": measurement_file.replace(".log", "").replace("_", " "),
+                                "value": value,
+                            })
+                            break
+                        else:
+                            measurements.append({
+                                "name": measurement_file.replace(".log", "").replace("_", " "),
+                                "value": "Error",
+                            })
+                            break
+            else:
+                measurements.append({
+                    "name": measurement_file.replace(".log", "").replace("_", " "),
+                    "value": "UNKNOWN",
+                })
+
+        print(f"Measurements:\n{measurements}")
+
+        return measurements
