@@ -142,4 +142,22 @@ ApplicationWindow {
             updateModelAfterAction();
         }
     }
+
+    MesurementListModel {
+        id: measurementModel
+
+        function updateModelAfterAction() {
+            var loadedList = backend.loadMeasurements(roomId);
+            measurementModel.updateModel(loadedList);
+        }
+
+        Component.onCompleted: {
+            updateModelAfterAction();
+        }
+
+        onMeasurementUpdated: {
+            backend.updateMeasurement(roomId, measurementName, measurementValue);
+            updateModelAfterAction();
+        }
+    }
 }

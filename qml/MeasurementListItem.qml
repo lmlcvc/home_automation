@@ -9,8 +9,8 @@ Item {
 
     property var itemData: { }
 
-    property string measurementName: itemData.measurementName
-    property string measurementValue: itemData.measurementValue
+    property string measurementName: itemData.name
+    property string measurementValue: itemData.value
 
     RowLayout {
         width: parent.width
@@ -22,10 +22,12 @@ Item {
 
             Text {
                 text: measurementName
+                color: "white"
             }
 
             Text {
                 text: measurementValue
+                color: "lightgreen"
             }
         }
     }

@@ -142,3 +142,24 @@ class Backend(QObject):
                 break
         else:
             print("Invalid room ID:", room_id)
+
+    def getLastValueFromFile(self, room_id, measurement, device_name):
+        # Load the log file data for the room
+        log_file_path = f"./logs/{room_id}_{device_name}.log"
+        if os.path.exists(log_file_path):
+            with open(log_file_path, 'r') as log_file:
+                lines = log_file.readlines()
+                for line in reversed(lines):
+                    timestamp, value = line.strip().split(', ')
+                    if measurement == 'Temperature':
+                        return f"{value}°C" if value != 'ERR' else "Error"
+                    elif measurement == 'Humidity':
+                        return f"{value}%" if value != 'ERR' else "Error"
+                    elif measurement == 'Air Pressure':
+                        return f"{value} hPa" if value != 'ERR' else "Error"
+            return "UNKNOWN"
+        return "UNKNOWN"
+
+    @pyqtSlot(result=list)
+    def loadMeasurements(self, roomId):
+        return [{"name": "temperature", "value": "69"}]

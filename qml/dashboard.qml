@@ -8,111 +8,109 @@ RowLayout {
     anchors.fill: parent
     spacing: 10
 
-    // AC control and current values
-    ColumnLayout {
-        spacing: 10
-        Layout.alignment: Qt.AlignTop
+    property int currentRoomId: 0
 
-        Switch {
-            id: acSwitch
-            text: "AC"
-        }
-
+        // AC control and current values
         ColumnLayout {
-            Repeater {
-                model: ["Temperature: 24°C", "Humidity: 50%", "Air Pressure: 1015 hPa", "Brightness: 80%", "Power Usage: 100W"]
-                delegate: Text {
-                    text: modelData
-                    color: "white"
+            spacing: 10
+            Layout.alignment: Qt.AlignTop
+
+            Switch {
+                id: acSwitch
+                text: "AC"
+            }
+
+            ListView {
+                id: currentValues
+                
+                width: parent.width
+                Layout.fillHeight: true
+
+                model: measurementModel
+
+                delegate: MeasurementListItem {
+                    width: parent.width
+                    height: 40
+                    itemData: model
                 }
             }
         }
-    }
 
-    // Graphs
-    ColumnLayout {
-        spacing: 10
-        Layout.alignment: Qt.AlignCenter
-
-        Rectangle {
-            width: 200
-            height: 200
-            color: "lightblue"
-        }
-    }
-
-    // Time, date, weather, and device list
-    ColumnLayout {
-        spacing: 10
-        Layout.alignment: Qt.AlignTop
-
-        Text {
-            text: "Time: 10:00 AM"
-            color: "white"
-        }
-
-        Text {
-            text: "Date: June 17, 2023"
-            color: "white"
-        }
-
-        Text {
-            text: "Weather: Sunny"
-            color: "white"
-        }
-
+        // Graphs
         ColumnLayout {
-            Repeater {
-                model: ["Device 1", "Device 2", "Device 3"]
-                delegate: Switch {
-                    text: modelData
-                    Layout.alignment: Qt.AlignLeft
+            spacing: 10
+            Layout.alignment: Qt.AlignCenter
+
+            Rectangle {
+                width: 200
+                height: 200
+                color: "lightblue"
+            }
+        }
+
+        // Time, date, weather, and device list
+        ColumnLayout {
+            spacing: 10
+            Layout.alignment: Qt.AlignTop
+
+            Text {
+                text: "Time: 10:00 AM"
+                color: "white"
+            }
+
+            Text {
+                text: "Date: June 17, 2023"
+                color: "white"
+            }
+
+            Text {
+                text: "Weather: Sunny"
+                color: "white"
+            }
+
+            ColumnLayout {
+                Repeater {
+                    model: ["Device 1", "Device 2", "Device 3"]
+                    delegate: Switch {
+                        text: modelData
+                        Layout.alignment: Qt.AlignLeft
+                    }
                 }
             }
         }
-    }
 
-    // Right side buttons
-    ScrollView {
-        id: buttons_rooms
-        Layout.fillHeight: true
 
-        Container {
-            id: rightTabBar
-
-            currentIndex: 1
+        // Right side buttons (room selection)
+        ColumnLayout {
+            id: rightTabBarContentLayout
+            spacing: 3
 
             Layout.fillHeight: true
+            Layout.preferredWidth: 100
 
-            ButtonGroup {
-                buttons: rightTabBarContentLayout.children
-            }
+            property int preferredButtonHeight: Math.min(dashboardWindow.height / roomModel.count, 100)
 
-            contentItem: ColumnLayout {
-                id: rightTabBarContentLayout
-                spacing: 3
 
-                Component.onCompleted: {
-                    var loadedList = backend.loadData()
-                    console.log("Loaded list:", loadedList)
+            Repeater {
+                model: roomModel
+
+                delegate: Button {
+                text: model.roomName
+
+                Layout.preferredWidth: 100
+                Layout.preferredHeight: rightTabBarContentLayout.preferredButtonHeight
+
+                property bool isSelected: model.roomId == dashboardWindow.currentRoomId
+
+                background: Rectangle {
+                    color: isSelected ? "lightgreen" : "white"
                 }
 
-                Repeater {
-                    // TODO: model should be model from main
-                    model: dashboardWindow.backend.loadData() // Bind the model to the Repeater
-                    delegate: Button {
-                        property int roomId: index // Assign the index as the roomId
-                        property string roomName: modelData.roomName // Assign the modelData as the roomName
-
-                        text: roomName // Display the room name
-                        Layout.maximumHeight: featurebutton_control.height
-                        Layout.fillHeight: true
-
-                        // Emit a signal when the room button is clicked
-                        onClicked: {
-                            backend.roomClicked(roomId, roomName)
-                        }
-                    }
+                // Emit a signal when the room button is clicked
+                onClicked: {
+                    console.log(dashboardWindow.height, roomModel.count)
+                    backend.roomClicked(roomId, roomName);
+                    dashboardWindow.currentRoomId = model.roomId;
                 }
             }
         }
