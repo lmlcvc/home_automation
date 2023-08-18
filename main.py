@@ -13,7 +13,7 @@ if __name__ == '__main__':
     m_logger = message_logger.MessageLogger(m_backend) 
 
     # Register the backend object as a context property
-    engine.rootContext().setContextProperty("backend", m_backend)
+    engine.rootContext().setContextProperty("backend", m_backend)   # XXX: instantiate somewhere else, not globally accessible
 
     # Load the QML file
     engine.load("qml/main.qml")

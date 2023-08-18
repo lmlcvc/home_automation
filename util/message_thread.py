@@ -43,4 +43,4 @@ class MessageThread(QThread):
 
             self.messageReceived.emit(message)  # Emit the generated message
 
-            time.sleep(1)
+            time.sleep(10)
