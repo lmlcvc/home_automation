@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-
+import QtPositioning 5.15
 
 RowLayout {
     id: dashboardWindow
@@ -10,6 +10,17 @@ RowLayout {
     spacing: 10
 
     property int currentRoomId: 0
+
+    property string weatherDescription: ""
+    property string weatherTemperature: ""
+    
+    property var locationData: "Geneva, Switzerland"     // TODO: fetch location
+    // TODO: handle unknown location
+
+    signal weatherDataUpdated(string description)
+    onWeatherDataUpdated: {
+        weatherData = description; // Update the description when the signal is received
+    }
 
     signal dashboardCurrentRoomIdChanged(int roomId)
     onDashboardCurrentRoomIdChanged: {
@@ -42,65 +53,71 @@ RowLayout {
         }
     }
 
-        // Graphs
-        ColumnLayout {
-            spacing: 10
-            Layout.alignment: Qt.AlignCenter
+    // Graphs
+    ColumnLayout {
+        spacing: 10
+        Layout.alignment: Qt.AlignCenter
 
-            Rectangle {
-                width: 200
-                height: 200
-                color: "lightblue"
-            }
+        Rectangle {
+            width: 200
+            height: 200
+            color: "lightblue"
+        }
+    }
+
+    // Time, date, weather, and device list
+    ColumnLayout {
+        spacing: 10
+        Layout.alignment: Qt.AlignTop
+
+        Text {
+            text: "Time: " + getCurrentTime()
+            color: "white"
         }
 
-        // Time, date, weather, and device list
+        Text {
+            text: "Date: " + getCurrentDate()
+            color: "white"
+        }
+
+        Text {
+            text: "Location: " + locationData
+            color: "white"
+            Component.onCompleted: fetchLocation() // Fetch the user's location on component completion
+        }
+
+        Text {
+            text: "Weather: " + weatherTemperature + ", " + weatherDescription
+            color: "white"
+            Component.onCompleted: fetchWeather()
+        }
+
+
         ColumnLayout {
-            spacing: 10
-            Layout.alignment: Qt.AlignTop
-
-            Text {
-                text: "Time: 10:00 AM"
-                color: "white"
-            }
-
-            Text {
-                text: "Date: June 17, 2023"
-                color: "white"
-            }
-
-            Text {
-                text: "Weather: Sunny"
-                color: "white"
-            }
-
-            ColumnLayout {
-                Repeater {
-                    model: ["Device 1", "Device 2", "Device 3"]
-                    delegate: Switch {
-                        text: modelData
-                        Layout.alignment: Qt.AlignLeft
-                    }
+            Repeater {
+                model: ["Device 1", "Device 2", "Device 3"]
+                delegate: Switch {
+                    text: modelData
+                    Layout.alignment: Qt.AlignLeft
                 }
             }
         }
+    }
 
+    // Right side buttons (room selection)
+    ColumnLayout {
+        id: rightTabBarContentLayout
+        spacing: 3
 
-        // Right side buttons (room selection)
-        ColumnLayout {
-            id: rightTabBarContentLayout
-            spacing: 3
+        Layout.fillHeight: true
+        Layout.preferredWidth: 100
 
-            Layout.fillHeight: true
-            Layout.preferredWidth: 100
+        property int preferredButtonHeight: Math.min(dashboardWindow.height / roomModel.count, 100)
 
-            property int preferredButtonHeight: Math.min(dashboardWindow.height / roomModel.count, 100)
+        Repeater {
+            model: roomModel
 
-
-            Repeater {
-                model: roomModel
-
-                delegate: Button {
+            delegate: Button {
                 text: model.roomName
 
                 Layout.preferredWidth: 100
@@ -122,5 +139,51 @@ RowLayout {
                 }
             }
         }
+    }
+    
+    // TODO: update regularly
+    function getCurrentTime() {
+        var currentTime = new Date();
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        
+        // Format the time as HH:MM
+        return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+    }
+    
+    function getCurrentDate() {
+        var currentDate = new Date();
+        var year = currentDate.getFullYear();
+        var month = currentDate.getMonth() + 1;
+        var day = currentDate.getDate();
+        
+        return day + "/" + (month < 10 ? "0" : "") + month + "/" + year;
+    }
+
+    function fetchWeather() {
+        var weatherApiKey = "72a2a76b30dd2c83d3e9ca25905faa9c";     // TODO: store safely
+        var weatherApiUrl = "http://api.openweathermap.org/data/2.5/weather?q=Geneva,Switzerland&appid=" + weatherApiKey;
+
+        var request = new XMLHttpRequest();
+        request.open("GET", weatherApiUrl);
+        request.onreadystatechange = function() {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                if (request.status === 200) {
+                    var response = JSON.parse(request.responseText);
+
+                    var description = response.weather[0].description;
+                    var temperatureKelvin = response.main.temp;
+                    var temperatureCelsius = (temperatureKelvin - 273.15).toFixed(2);
+
+                    weatherDescription = description;
+                    weatherTemperature = temperatureCelsius + " °C";
+                } else {
+                    weatherDescription = "unknown";
+                    weatherTemperature = "unknown";
+                    console.error("Error fetching weather data");
+                }
+            }
+        }
+        request.send();
     }
 }
