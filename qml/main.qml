@@ -69,12 +69,12 @@ ApplicationWindow {
                 }
 
                 FeatureButton {
-                    text: qsTr("Security")
-                    icon.name: "security"
+                    text: qsTr("Management")
+                    icon.name: "management"
                     Layout.fillHeight: true
 
                     onClicked: {
-                        contentLoader.source = ""
+                        contentLoader.source = "management.qml"
                     }
                 }
 
