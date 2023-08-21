@@ -9,7 +9,7 @@ RowLayout {
     anchors.fill: parent
     spacing: 10
 
-    property int currentRoomId: 0
+    property int currentRoomId: 0  // TODO: -1 when synced everywhere?
 
     property string weatherDescription: ""
     property string weatherTemperature: ""

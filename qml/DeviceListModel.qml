@@ -3,7 +3,7 @@ import QtQuick 2.15
 ListModel {
     id: deviceListModel
 
-    property int currentRoomId: 1       // TODO: manage room ID
+    property int currentRoomId: 0       // TODO: manage room ID
 
     function updateModel(deviceObjects, roomId) {
         deviceListModel.clear();

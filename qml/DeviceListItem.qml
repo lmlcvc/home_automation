@@ -21,6 +21,11 @@ Item {
             Switch {
                 Layout.alignment: Qt.AlignLeft
                 checked: itemData.state.toLowerCase() === "on"
+
+                onToggled: {
+                    var newState = checked ? "on" : "off";
+                    backend.updateDeviceState(roomIndex, itemData.name, newState);
+                }
             }
 
             Text {

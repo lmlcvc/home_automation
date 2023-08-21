@@ -153,7 +153,6 @@ class Backend(QObject):
                 break
         return devices
 
-
     @pyqtSlot(int, result=list)
     def loadMeasurements(self, currentRoomId):
         # TODO: add measurement units
@@ -194,3 +193,14 @@ class Backend(QObject):
         print(f"Measurements:\n{measurements}")
 
         return measurements
+
+    @pyqtSlot(int, str, str)
+    def updateDeviceState(self, room_id, device_name, new_state):
+        for room in self.room_list:
+            if room['roomId'] == room_id:
+                for device in room['devices']:
+                    if device['name'] == device_name:
+                        device['state'] = new_state
+                        self.save_room_list()
+                        return
+        print("Invalid room ID:", room_id)
