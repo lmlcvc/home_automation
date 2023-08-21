@@ -55,6 +55,11 @@ Item {
                     icon.height: height
                     icon.source: "../images/edit.png"
                     Layout.alignment: Qt.AlignRight
+
+                    background: Rectangle {
+                        color: "transparent"
+                    }
+
                     onClicked: {
                         editRoomDialog.open()
                     }
@@ -70,6 +75,11 @@ Item {
                     icon.height: height
                     icon.source: "../images/delete.png"
                     Layout.alignment: Qt.AlignRight
+
+                   background: Rectangle {
+                        color: "transparent"
+                    }
+
                     onClicked: {
                         deleteRoomDialog.roomName = roomName;
                         deleteRoomDialog.open();
@@ -84,26 +94,16 @@ Item {
                     implicitHeight: height
                     icon.width: width
                     icon.height: height
-                    icon.source: "../images/add.png"        // TODO: some other img
+                    icon.source: "../images/manage.png"
                     Layout.alignment: Qt.AlignRight
+
+                   background: Rectangle {
+                        color: "transparent"
+                    }
+
                     onClicked: {
                         manageRoomDevicesDialog.roomName = roomName;
                         manageRoomDevicesDialog.open();
-                    }
-                }
-
-                Button {
-                    id: button_expand
-                    width: buttonSize
-                    height: buttonSize
-                    implicitWidth: width
-                    implicitHeight: height
-                    icon.width: width
-                    icon.height: height
-                    icon.source: "../images/expand.png"
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        deviceListView.visible = !deviceListView.visible
                     }
                 }
             }
