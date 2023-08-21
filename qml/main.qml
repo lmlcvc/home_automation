@@ -149,7 +149,7 @@ ApplicationWindow {
 
         function updateDevices() {
             var loadedList = backend.getDevicesForRoom(currentRoomId);
-            deviceModel.updateModel(loadedList);
+            deviceModel.updateModel(loadedList, currentRoomId);
         }
 
         Component.onCompleted: {

@@ -8,7 +8,7 @@ Item {
     width: parent.width
 
     property var itemData: { }
-    property int roomIndex: 0
+    property int roomIndex: -1
 
     ColumnLayout {
         width: parent.width
