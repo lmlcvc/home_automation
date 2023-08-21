@@ -144,6 +144,21 @@ ApplicationWindow {
         }
     }
 
+    DeviceListModel {
+        id: deviceModel
+
+        function updateDevices() {
+            var loadedList = backend.getDevicesForRoom(currentRoomId);
+            deviceModel.updateModel(loadedList);
+        }
+
+        Component.onCompleted: {
+            updateDevices();
+        }
+
+        // TODO: catch room updating signals?
+    }
+
     MesurementListModel {
         id: measurementModel
 

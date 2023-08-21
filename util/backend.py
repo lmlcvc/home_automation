@@ -105,7 +105,8 @@ class Backend(QObject):
             if room['roomId'] == room_id:
                 new_device = {
                     'name': device_name,
-                    'measurement': measurement
+                    'measurement': measurement,
+                    'state': "OFF"
                 }
                 room['devices'].append(new_device)
                 self.save_room_list()
@@ -144,9 +145,20 @@ class Backend(QObject):
             print("Invalid room ID:", room_id)
 
     @pyqtSlot(int, result=list)
+    def getDevicesForRoom(self, room_id):
+        devices = []
+        for room in self.room_list:
+            if room['roomId'] == room_id:
+                devices = room['devices']
+                break
+        return devices
+
+
+    @pyqtSlot(int, result=list)
     def loadMeasurements(self, currentRoomId):
         # TODO: add measurement units
         # TODO: if measurement is too old, append "UNKNOWN" instead of value
+        # TODO: fetch by device? (tmp.py)
         measurement_files = [
             filename for filename in os.listdir(f"./logs/{currentRoomId}")
         ]

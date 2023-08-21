@@ -32,11 +32,6 @@ RowLayout {
         spacing: 10
         Layout.alignment: Qt.AlignTop
 
-        Switch {
-            id: acSwitch
-            text: "AC"
-        }
-
         ListView {
             id: currentValues
             
@@ -87,20 +82,27 @@ RowLayout {
         }
 
         Text {
-            text: "Weather: " + weatherTemperature + ", " + weatherDescription
+            text: (weatherTemperature != "unknown") ? ("Weather: " + weatherTemperature + ", " + weatherDescription) : "Weather: unknown"
             color: "white"
             Component.onCompleted: fetchWeather()
         }
 
+        ListView {
+            id: deviceController
 
-        ColumnLayout {
-            Repeater {
-                model: ["Device 1", "Device 2", "Device 3"]
-                delegate: Switch {
-                    text: modelData
-                    Layout.alignment: Qt.AlignLeft
-                }
+            width: parent.width
+            Layout.fillHeight: true
+
+            model: deviceModel
+
+            delegate: DeviceListItem {
+                width: parent.width
+                height: 40
+                itemData: model
+                roomIndex: dashboardWindow.currentRoomId
             }
+
+            // TODO: turning device off modifies json
         }
     }
 
