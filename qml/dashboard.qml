@@ -66,7 +66,7 @@ RowLayout {
         Layout.alignment: Qt.AlignTop
 
         Text {
-            text: "Time: " + getCurrentTime()
+            id: currentTimeText
             color: "white"
         }
 
@@ -99,7 +99,7 @@ RowLayout {
                 width: parent.width
                 height: 40
                 itemData: model
-                roomIndex: dashboardWindow.currentRoomId
+                roomIndex: currentRoomId
             }
 
             // TODO: turning device off modifies json
@@ -140,6 +140,31 @@ RowLayout {
                     dashboardCurrentRoomIdChanged(roomModel.roomId);
                 }
             }
+        }
+    }
+
+    Timer {
+        // FIXME: initialised but not updating
+        id: dashboardUpdateTimer
+        interval: 10000 // Update every 10 seconds
+        repeat: true
+
+        onTriggered: {
+            updateTimeAndWeather();
+            console.log("eeeeeee");
+        }
+
+        Component.onCompleted: {
+            updateTimeAndWeather(); // Update immediately upon component completion
+            console.log("timer initialised");
+        }
+    }
+
+    function updateTimeAndWeather() {
+        currentTimeText.text = "Time: " + getCurrentTime();
+
+        if (new Date().getMinutes() == 0) {    // Update the weather every hour
+            fetchWeather();
         }
     }
     
