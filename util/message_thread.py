@@ -7,6 +7,14 @@ GEN_PERCENTAGE_RANGE = (-10, 110)
 GEN_PRESSURE_RANGE = (800, 1200)
 GEN_BRIGHTNESS_RANGE = (-10, 1100)
 
+MEASUREMENT_NAMES = {
+    'temperature': 'T',
+    'humidity': 'H',
+    'air pressure': 'P',
+    'brightness': 'B',
+    'power consumption': 'C'
+}
+
 class MessageThread(QThread):
     messageReceived = pyqtSignal(str)
 
@@ -18,8 +26,6 @@ class MessageThread(QThread):
         self.generate_dummy_data()
 
     def generate_dummy_data(self):
-        measurements = ['T', 'H', 'P', 'B', 'C']
-
         while True:
             room_ids = self.backend.getRoomIds()
             if not room_ids:
@@ -27,20 +33,31 @@ class MessageThread(QThread):
                 return
 
             room_id = random.choice(room_ids)
-            measurement = random.choice(measurements)
+            room_devices = self.backend.getDevicesForRoom(room_id)
 
-            if measurement == 'T':
-                value = random.uniform(GEN_TEMPERATURE_RANGE[0], GEN_TEMPERATURE_RANGE[1])
-            elif measurement == 'H' or measurement == 'C':
-                value = random.uniform(GEN_PERCENTAGE_RANGE[0], GEN_PERCENTAGE_RANGE[1])
-            elif measurement == 'P':
-                value = random.uniform(GEN_PRESSURE_RANGE[0], GEN_PRESSURE_RANGE[1])
-            elif measurement == 'B':
-                value = random.uniform(GEN_BRIGHTNESS_RANGE[0], GEN_BRIGHTNESS_RANGE[1])
+            if not room_devices:
+                continue
 
-            message = f"{room_id} {measurement} {value:.2f}"
-            print("Generated message:", message)
+            device = random.choice(room_devices)
+            device_state = device['state']  
+            measurement = device['measurement']
+            measurement_code = MEASUREMENT_NAMES.get(measurement, 'UNKNOWN')
 
-            self.messageReceived.emit(message)  # Emit the generated message
+            if device_state.lower() == 'on': 
+                value = None
+                if measurement == 'temperature':
+                    value = random.uniform(
+                        GEN_TEMPERATURE_RANGE[0], GEN_TEMPERATURE_RANGE[1])
+                elif measurement == 'humidity' or measurement == 'brightness':
+                    value = random.uniform(
+                        GEN_PERCENTAGE_RANGE[0], GEN_PERCENTAGE_RANGE[1])
+                elif measurement == 'air pressure':
+                    value = random.uniform(
+                        GEN_PRESSURE_RANGE[0], GEN_PRESSURE_RANGE[1])
 
-            time.sleep(10)
+                if value is not None:
+                    message = f"{room_id} {measurement_code} {value:.2f}"
+                    print("Generated message:", message)
+                    self.messageReceived.emit(message)
+
+            time.sleep(1)
