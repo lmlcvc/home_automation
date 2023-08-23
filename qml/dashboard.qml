@@ -3,13 +3,15 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtPositioning 5.15
 
+// TODO: refresh btn
+
 RowLayout {
     id: dashboardWindow
 
     anchors.fill: parent
     spacing: 10
 
-    property int currentRoomId: 0  // TODO: -1 when synced everywhere?
+    property int currentRoomId
 
     property string weatherDescription: ""
     property string weatherTemperature: ""
@@ -19,15 +21,25 @@ RowLayout {
 
     signal weatherDataUpdated(string description)
     onWeatherDataUpdated: {
-        weatherData = description; // Update the description when the signal is received
+        weatherData = description;
     }
 
     signal dashboardCurrentRoomIdChanged(int roomId)
     onDashboardCurrentRoomIdChanged: {
         measurementModel.updateMeasurements(dashboardWindow.currentRoomId);
+        deviceModel.updateDevices();
     }
 
-    // AC control and current values
+    Component.onCompleted: {
+        if (roomModel.count > 0) {
+            currentRoomId = roomModel.get(0).roomId;
+            dashboardCurrentRoomIdChanged(currentRoomId);
+        }
+
+        updateTimeAndWeather();
+    }
+
+    // Current values
     ColumnLayout {
         spacing: 10
         Layout.alignment: Qt.AlignTop
@@ -101,8 +113,6 @@ RowLayout {
                 itemData: model
                 roomIndex: currentRoomId
             }
-
-            // TODO: turning device off modifies json
         }
     }
 
@@ -133,11 +143,8 @@ RowLayout {
 
                 // Emit a signal when the room button is clicked
                 onClicked: {       
-                    console.log(dashboardWindow.height, roomModel.count, model.roomName);
-                    // backend.roomClicked(model.roomId, model.roomName);
-
                     dashboardWindow.currentRoomId = model.roomId;
-                    dashboardCurrentRoomIdChanged(roomModel.roomId);
+                    dashboardCurrentRoomIdChanged(dashboardWindow.currentRoomId);
                 }
             }
         }
@@ -151,7 +158,7 @@ RowLayout {
 
         onTriggered: {
             updateTimeAndWeather();
-            console.log("eeeeeee");
+            console.log("Timer triggered.");
         }
 
         Component.onCompleted: {
@@ -168,7 +175,6 @@ RowLayout {
         }
     }
     
-    // TODO: update regularly
     function getCurrentTime() {
         var currentTime = new Date();
         var hours = currentTime.getHours();

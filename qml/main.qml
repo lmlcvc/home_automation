@@ -107,11 +107,6 @@ ApplicationWindow {
         function updateModelAfterAction() {
             var loadedList = backend.loadData();
             roomModel.updateModel(loadedList);
-
-            console.log("Loaded list:");
-            for (var i = 0; i < loadedList.length; i++) {
-                console.log("Room Name:", loadedList[i].roomName);
-            }
         }
 
         Component.onCompleted: {
@@ -153,8 +148,9 @@ ApplicationWindow {
         id: deviceModel
 
         function updateDevices() {
-            var loadedList = backend.getDevicesForRoom(currentRoomId);
-            deviceModel.updateModel(loadedList, currentRoomId);
+            var loadedList = backend.getDevicesForRoom(contentLoader.item.currentRoomId);
+            deviceModel.updateRoomId(contentLoader.item.currentRoomId);
+            deviceModel.updateModel(loadedList);
         }
 
         Component.onCompleted: {
