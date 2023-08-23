@@ -10,7 +10,7 @@ Item {
     property var itemData: { }
     property int buttonSize: 36
 
-    property string roomName: itemData.roomName
+    property string roomName: itemData.roomName || ""
     property var devices: itemData.devices
     property string selectedMeasurement: "temperature" // Default measurement
 

@@ -107,6 +107,11 @@ ApplicationWindow {
         function updateModelAfterAction() {
             var loadedList = backend.loadData();
             roomModel.updateModel(loadedList);
+
+            console.log("Loaded list:");
+            for (var i = 0; i < loadedList.length; i++) {
+                console.log("Room Name:", loadedList[i].roomName);
+            }
         }
 
         Component.onCompleted: {
