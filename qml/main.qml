@@ -164,7 +164,8 @@ ApplicationWindow {
         id: measurementModel
 
         function updateMeasurements() {
-            var loadedList = backend.loadMeasurements(currentRoomId);
+            var loadedList = backend.loadMeasurements(contentLoader.item.currentRoomId);
+            measurementModel.updateRoomId(contentLoader.item.currentRoomId);
             measurementModel.updateModel(loadedList);
         }
 
