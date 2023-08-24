@@ -3,7 +3,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtPositioning 5.15
 
-// TODO: refresh btn
 
 RowLayout {
     id: dashboardWindow
@@ -43,12 +42,14 @@ RowLayout {
     ColumnLayout {
         spacing: 10
         Layout.alignment: Qt.AlignTop
+        Layout.fillHeight: true
+        Layout.preferredWidth: 200
 
         ListView {
             id: currentValues
             
             width: parent.width
-            Layout.fillHeight: true
+            Layout.preferredHeight: 200
 
             model: measurementModel
 
@@ -60,22 +61,14 @@ RowLayout {
         }
     }
 
-    // Graphs
-    ColumnLayout {
-        spacing: 10
-        Layout.alignment: Qt.AlignCenter
-
-        Rectangle {
-            width: 200
-            height: 200
-            color: "lightblue"
-        }
-    }
 
     // Time, date, weather, and device list
     ColumnLayout {
+        id: infoColumn
+
         spacing: 10
         Layout.alignment: Qt.AlignTop
+        Layout.fillWidth: true
 
         Text {
             id: currentTimeText
@@ -103,7 +96,8 @@ RowLayout {
             id: deviceController
 
             width: parent.width
-            Layout.fillHeight: true
+            height: parent.height - buttonRefresh.height // Adjust the height to account for the Refresh button
+            Layout.alignment: Qt.AlignTop
 
             model: deviceModel
 
@@ -112,6 +106,16 @@ RowLayout {
                 height: 40
                 itemData: model
                 roomIndex: currentRoomId
+            }
+        }
+
+        Button {
+            id: buttonRefresh
+            text: "Refresh all"
+            Layout.alignment: Qt.AlignBottom | Qt.AlignLeft
+            
+            onClicked: {
+                refreshAllContent();
             }
         }
     }
@@ -223,5 +227,11 @@ RowLayout {
             }
         }
         request.send();
+    }
+
+    function refreshAllContent() {
+        updateTimeAndWeather();
+        measurementModel.updateMeasurements(dashboardWindow.currentRoomId);
+        deviceModel.updateDevices();
     }
 }
