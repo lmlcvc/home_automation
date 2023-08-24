@@ -31,7 +31,7 @@ Item {
         Rectangle {
             width: parent.width
             height: 1
-            color: "white"
+            color: colorBright
         }
 
         RowLayout {

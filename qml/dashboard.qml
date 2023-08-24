@@ -79,23 +79,23 @@ RowLayout {
 
         Text {
             id: currentTimeText
-            color: "white"
+            color: colorBright
         }
 
         Text {
             text: "Date: " + getCurrentDate()
-            color: "white"
+            color: colorBright
         }
 
         Text {
             text: "Location: " + locationData
-            color: "white"
+            color: colorBright
             Component.onCompleted: fetchLocation() // Fetch the user's location on component completion
         }
 
         Text {
             text: (weatherTemperature != "unknown") ? ("Weather: " + weatherTemperature + ", " + weatherDescription) : "Weather: unknown"
-            color: "white"
+            color: colorBright
             Component.onCompleted: fetchWeather()
         }
 
@@ -138,7 +138,7 @@ RowLayout {
                 property bool isSelected: model.roomId == dashboardWindow.currentRoomId
 
                 background: Rectangle {
-                    color: isSelected ? "lightgreen" : "white"
+                    color: isSelected ? colorMain : colorBright
                 }
 
                 // Emit a signal when the room button is clicked

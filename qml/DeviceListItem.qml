@@ -28,7 +28,7 @@ Item {
 
             Text {
                 text: itemData.name
-                color: "white"
+                color: colorBright
                 Layout.fillWidth: true
             }
         }

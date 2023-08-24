@@ -2,9 +2,18 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
+import "../util"
+
 
 ApplicationWindow {
     id: mainAppWindow
+
+    readonly property color colorAccent: "mediumseagreen"
+    readonly property color colorWarning: "red"
+    readonly property color colorMain: "lightgreen"
+    readonly property color colorBright: "#eeeeee"
+    readonly property color colorLightGrey: "#888"
+    readonly property color colorDarkGrey: "#111"
 
     // Set window dimensions and properties
     width: 1280
@@ -14,78 +23,65 @@ ApplicationWindow {
     visible: true
     title: "Home Automation"
 
-    // Define color properties
-    readonly property color colorGlow: "#1ddd14"
-    readonly property color colorWarning: "#d5232f"
-    readonly property color colorMain: "#6aff6a"
-    readonly property color colorBright: "#ffffff"
-    readonly property color colorLightGrey: "#888"
-    readonly property color colorDarkGrey: "#333"
-
     // Set window background color
-    color: "black"
+    color: colorDarkGrey
 
+    // App control
     RowLayout {
-        anchors.fill: parent
-        spacing: 10
+        id: appControl
+        Layout.fillHeight: true
 
-        // App control
-        ScrollView {
-            id: buttons_control
+        ColumnLayout {
+            id: leftTabBar
+
+            Layout.fillWidth: false
             Layout.fillHeight: true
 
-            Container {
-                id: leftTabBar
+            ButtonGroup {
+                id: featureButtonGroup
+                buttons: columnLayout.children
 
-                currentIndex: 1
+                Component.onCompleted: {
+                    // Set the first button as checked by default
+                    if (buttons.length > 0) {
+                        buttons[0].checked = true;
+                    }
+                }
+            }
 
-                Layout.fillWidth: false
+            FeatureButton {
+                id: featurebutton_control
+                text: qsTr("Dashboard")
+                icon.name: "dashboard"
                 Layout.fillHeight: true
 
-                ButtonGroup {
-                    buttons: columnLayout.children
+                checked: true
+
+                onClicked: {
+                    featureButtonGroup.checkedButton = this;
+                    contentLoader.source = "dashboard.qml"
                 }
+            }
 
-                contentItem: ColumnLayout {
-                    id: columnLayout
-                    spacing: 3
+            FeatureButton {
+                text: qsTr("Management")
+                icon.name: "management"
+                Layout.fillHeight: true
 
-                    Repeater {
-                        model: leftTabBar.contentModel
-                    }
+                onClicked: {
+                    featureButtonGroup.checkedButton = this;
+                    contentLoader.source = "management.qml"
                 }
+            }
 
-                FeatureButton {
-                    id: featurebutton_control
-                    text: qsTr("Dashboard")
-                    icon.name: "dashboard"
-                    Layout.fillHeight: true
+            FeatureButton {
+                text: qsTr("Settings")
+                icon.name: "settings"
+                Layout.fillHeight: true
 
-                    checked: true
-
-                    onClicked: {
-                        contentLoader.source = "dashboard.qml"
-                    }
-                }
-
-                FeatureButton {
-                    text: qsTr("Management")
-                    icon.name: "management"
-                    Layout.fillHeight: true
-
-                    onClicked: {
-                        contentLoader.source = "management.qml"
-                    }
-                }
-
-                FeatureButton {
-                    text: qsTr("Settings")
-                    icon.name: "settings"
-                    Layout.fillHeight: true
-
-                    onClicked: {
-                        contentLoader.source = "settings.qml"
-                    }
+                onClicked: {
+                    featureButtonGroup.checkedButton = this;
+                    contentLoader.source = "settings.qml"
                 }
             }
         }
@@ -160,6 +156,7 @@ ApplicationWindow {
         // TODO: catch room updating signals?
     }
 
+    // TODO: update measurements as they're incoming
     MesurementListModel {
         id: measurementModel
 

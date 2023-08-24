@@ -21,12 +21,12 @@ Item {
             Text {
                 Layout.minimumWidth: 120
                 text: measurementName
-                color: "white"
+                color: colorBright
             }
 
             Text {
                 text: measurementValue
-                color: measurementValue.toLowerCase().includes("err") ? "red" : "lightgreen"
+                color: measurementValue.toLowerCase().includes("err") ? colorWarning : colorMain
             }
         }
     }
