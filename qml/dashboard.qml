@@ -123,8 +123,9 @@ RowLayout {
 
         Layout.fillHeight: true
         Layout.preferredWidth: 100
+        Layout.alignment: Qt.AlignTop
 
-        property int preferredButtonHeight: Math.min(dashboardWindow.height / roomModel.count, 100)
+        property int preferredButtonHeight: Math.min(dashboardWindow.height / roomModel.count, 75)
 
         Repeater {
             model: roomModel
@@ -145,6 +146,10 @@ RowLayout {
                 onClicked: {       
                     dashboardWindow.currentRoomId = model.roomId;
                     dashboardCurrentRoomIdChanged(dashboardWindow.currentRoomId);
+
+                    console.log(dashboardWindow.height);
+                    console.log(roomModel.count);
+                    console.log(dashboardWindow.height / roomModel.count);
                 }
             }
         }

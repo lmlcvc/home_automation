@@ -14,11 +14,6 @@ Button {
     implicitWidth: 90
     implicitHeight: 90
 
-    icon.name: "placeholder"
-    icon.width: 44
-    icon.height: 44
-    display: Button.TextUnderIcon
-
     background: Rectangle {
         color: button.hovered ? colorAccent : (button.checked ? colorMain : colorBright)
     }
