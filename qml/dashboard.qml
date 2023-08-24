@@ -53,7 +53,7 @@ RowLayout {
             model: measurementModel
 
             delegate: MeasurementListItem {
-                width: parent.width
+                Layout.fillWidth: true
                 height: 40
                 itemData: model
             }
@@ -108,7 +108,7 @@ RowLayout {
             model: deviceModel
 
             delegate: DeviceListItem {
-                width: parent.width
+                Layout.fillWidth: true
                 height: 40
                 itemData: model
                 roomIndex: currentRoomId

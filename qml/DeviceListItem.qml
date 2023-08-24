@@ -5,8 +5,6 @@ import QtQuick.Controls.Material 2.15
 
 
 Item {
-    width: parent.width
-
     property var itemData: { }
     property int roomIndex: -1
 

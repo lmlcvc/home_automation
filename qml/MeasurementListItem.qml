@@ -5,8 +5,6 @@ import QtQuick.Dialogs 1.3
 
 
 Item {
-    width: parent.width 
-
     property var itemData: { }
 
     property string measurementName: itemData.name
@@ -21,6 +19,7 @@ Item {
             Layout.fillWidth: true
 
             Text {
+                Layout.minimumWidth: 120
                 text: measurementName
                 color: "white"
             }
