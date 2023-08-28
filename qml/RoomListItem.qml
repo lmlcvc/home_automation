@@ -5,7 +5,7 @@ import QtQuick.Dialogs 1.3
 
 
 Item {
-    width: parent.width 
+    Layout.fillWidth: true
 
     property var itemData: { }
     property int buttonSize: 36
@@ -16,9 +16,9 @@ Item {
 
     Rectangle {
         id: background
-        color: "#6aff6a"
+        color: colorMain
         width: parent.width
-        height: 60 // contentColumn.height
+        height: 60 
     }
 
 
@@ -30,20 +30,26 @@ Item {
 
         Rectangle {
             width: parent.width
-            height: 1
-            color: colorBright
+            height: 2
+            color: colorDarkGrey
         }
 
         RowLayout {
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignRight  // Align the whole row to the right
 
             Text {
                 text: roomName
+                leftPadding: 15
+                Layout.alignment: Qt.AlignLeft
             }
 
-
             RowLayout {
+                id: buttonsContainer
                 spacing: 10
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignRight
 
                 Button {
                     id: button_edit
@@ -152,7 +158,6 @@ Item {
         }
 
         Dialog {
-            // FIXME: make devices list scrollable
             // FIXME: align delete button to right
             id: manageRoomDevicesDialog
             title: "Manage Devices"
@@ -165,6 +170,7 @@ Item {
             property string deviceName: ""
             property var devicesToRemove: []
             property var displayedDevices: devices
+            property bool changesOccurred: false
 
 
             ColumnLayout {
@@ -177,32 +183,37 @@ Item {
                     }
                 }
 
-                ScrollView{
+                // FIXME: scrolling not possible
+                // scrollview or flickable
+                ScrollView {
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    /*contentWidth: deviceListView.contentWidth
+                    contentHeight: deviceListView.contentHeight
+                    interactive: true */
+                    height: 300
 
                     ListView {
                         id: deviceListView
                         width: parent.width
+                        spacing: 10
                         height: 300
 
                         model: manageRoomDevicesDialog.displayedDevices
 
                         delegate: RowLayout {
-                            width: parent.width
+                            Layout.fillWidth: true
                             height: 40
 
                             Text {
+                                //Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignLeft
                                 text: model.name + " (" + model.measurement + ")"
                             }
 
-
-                            // TODO: edit device implementation
-
-                            Item{
-                                Layout.fillWidth: true
+                            Item {
+                                //Layout.fillWidth: true
                                 height: buttonDelete.implicitHeight
+                                Layout.alignment: Qt.AlignRight
 
                                 Button {
                                     id: buttonDelete
@@ -214,7 +225,7 @@ Item {
 
                                         // Remove the device from the displayedDevices list
                                         for (var i = 0; i < manageRoomDevicesDialog.displayedDevices.count; i++) {
-                                            if (manageRoomDevicesDialog.displayedDevices.get(i).name === deviceToDelete) {
+                                            if (manageRoomDevicesDialog.displayedDevices.get(i).name == deviceToDelete) {
                                                 manageRoomDevicesDialog.displayedDevices.remove(i);
                                                 break;
                                             }
@@ -234,7 +245,8 @@ Item {
                 for (var i = 0; i < manageRoomDevicesDialog.displayedDevices.count; i++) {
                     updatedDevices.push({
                         name: manageRoomDevicesDialog.displayedDevices.get(i).name,
-                        measurement: manageRoomDevicesDialog.displayedDevices.get(i).measurement
+                        measurement: manageRoomDevicesDialog.displayedDevices.get(i).measurement,
+                        state: manageRoomDevicesDialog.displayedDevices.get(i).state
                     });
                 }
                 roomModel.devicesUpdated(itemData.roomId, updatedDevices);
@@ -299,7 +311,8 @@ Item {
                     } else {
                         var newDevice = {
                             name: newDeviceName,
-                            measurement: newDeviceMeasurement
+                            measurement: newDeviceMeasurement,
+                            state: "off"
                         };
                         manageRoomDevicesDialog.displayedDevices.append(newDevice);
                     }

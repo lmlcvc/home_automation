@@ -1,11 +1,14 @@
 import json
 import os
+import datetime
+import configparser
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 
 class Backend(QObject):
-    dataLoaded = pyqtSignal()  # Signal to notify QML about data loading
+    dataLoaded = pyqtSignal()       # TODO: see if necessary
+    measurementsUpdated = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -32,6 +35,9 @@ class Backend(QObject):
         with open('./room_list.json', 'r') as file:
             room_json = json.load(file)
         return [room['roomId'] for room in room_json]
+
+    def emitMeasurementsUpdated(self):
+        self.measurementsUpdated.emit()
 
     @pyqtSlot(str)
     def addRoom(self, room_name):
@@ -155,9 +161,14 @@ class Backend(QObject):
 
     @pyqtSlot(int, result=list)
     def loadMeasurements(self, currentRoomId):
-        # TODO: add measurement units
-        # TODO: if measurement is too old, append "UNKNOWN" instead of value
-        # TODO: fetch by device? (tmp.py)
+        measurement_units = {
+            "temperature": "°C",
+            "humidity": "%",
+            "air pressure": "hPa",
+            "power_consumption": "%",
+            "brightness": "lux",
+        }
+
         measurement_files = [
             filename for filename in os.listdir(f"./logs/{currentRoomId}")
         ]
@@ -170,17 +181,21 @@ class Backend(QObject):
                 with open(log_file_path, 'r') as log_file:
                     lines = log_file.readlines()
                     for line in reversed(lines):
-                        _, value = line.strip().split(', ')
+                        timestamp_str, value = line.strip().split(', ')
+                        measurement_name = measurement_file.replace(
+                            ".log", "").replace("_", " ")
 
                         if 'err' not in value.lower():
+
                             measurements.append({
-                                "name": measurement_file.replace(".log", "").replace("_", " "),
-                                "value": value,
+                                "name": measurement_name,
+                                "value": value + " " + measurement_units.get(measurement_name, ""),
                             })
+
                             break
                         else:
                             measurements.append({
-                                "name": measurement_file.replace(".log", "").replace("_", " "),
+                                "name": measurement_name,
                                 "value": "Error",
                             })
                             break
@@ -189,8 +204,6 @@ class Backend(QObject):
                     "name": measurement_file.replace(".log", "").replace("_", " "),
                     "value": "UNKNOWN",
                 })
-
-        print(f"Measurements:\n{measurements}")
 
         return measurements
 
@@ -204,3 +217,40 @@ class Backend(QObject):
                         self.save_room_list()
                         return
         print("Invalid room ID:", room_id)
+
+    @pyqtSlot(result=list)
+    def loadCitiesData(self):
+        try:
+            with open('./cities_data.json', 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            print("Cities data file not found.")
+
+    @pyqtSlot(float, float, str)
+    def addLocation(self, latitude, longitude, locationData):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
+        if 'Location' not in config:
+            config['Location'] = {}
+        config['Location']['latitude'] = str(latitude)
+        config['Location']['longitude'] = str(longitude)
+        config['Location']['locationData'] = locationData
+
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
+
+    @pyqtSlot(result="QVariantList")
+    def retrieveLocation(self):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
+        if 'Location' in config:
+            latitude = config['Location'].getfloat('latitude', -1)
+            longitude = config['Location'].getfloat('longitude', -1)
+            locationData = config.get('Location', 'locationData', fallback='')
+        else:
+            latitude = longitude = -1
+            locationData = ""
+
+        return [latitude, longitude, locationData]

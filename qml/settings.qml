@@ -41,7 +41,7 @@ ColumnLayout {
         model: roomModel
 
         delegate: RoomListItem {
-            width: parent.width
+            width: list_rooms.width
             height: 60
             itemData: model
         }

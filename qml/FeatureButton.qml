@@ -11,8 +11,9 @@ Button {
     rightPadding: 4
     topPadding: 12
     bottomPadding: 12
-    implicitWidth: 90
-    implicitHeight: 90
+
+    implicitHeight: 75
+    implicitWidth: 120
 
     background: Rectangle {
         color: button.hovered ? colorAccent : (button.checked ? colorMain : colorBright)
@@ -21,7 +22,6 @@ Button {
     contentItem: Text {
         text: button.text
         font: button.font
-        opacity: enabled ? 1.0 : 0.3
         color: "black"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

@@ -28,6 +28,6 @@ Item {
                 text: measurementValue
                 color: measurementValue.toLowerCase().includes("err") ? colorWarning : colorMain
             }
-        }
+        } 
     }
 }

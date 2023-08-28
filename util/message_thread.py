@@ -2,7 +2,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 import random
 import time
 
-GEN_TEMPERATURE_RANGE = (-60, 110)
+GEN_TEMPERATURE_RANGE = (-30, 50)
 GEN_PERCENTAGE_RANGE = (-10, 110)
 GEN_PRESSURE_RANGE = (800, 1200)
 GEN_BRIGHTNESS_RANGE = (-10, 1100)
@@ -59,5 +59,6 @@ class MessageThread(QThread):
                     message = f"{room_id} {measurement_code} {value:.2f}"
                     print("Generated message:", message)
                     self.messageReceived.emit(message)
+                    self.backend.emitMeasurementsUpdated()
 
             time.sleep(1)

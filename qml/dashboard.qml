@@ -15,13 +15,9 @@ RowLayout {
     property string weatherDescription: ""
     property string weatherTemperature: ""
     
-    property var locationData: "Geneva, Switzerland"     // TODO: fetch location
-    // TODO: handle unknown location
-
-    signal weatherDataUpdated(string description)
-    onWeatherDataUpdated: {
-        weatherData = description;
-    }
+    property var locationData: ""  
+    property real latitude: -1
+    property real longitude: -1
 
     signal dashboardCurrentRoomIdChanged(int roomId)
     onDashboardCurrentRoomIdChanged: {
@@ -35,28 +31,105 @@ RowLayout {
             dashboardCurrentRoomIdChanged(currentRoomId);
         }
 
+        loadCitiesData();
+        retrieveLocationData();
         updateTimeAndWeather();
+        fetchWeather();
     }
 
     // Current values
     ColumnLayout {
         spacing: 10
         Layout.alignment: Qt.AlignTop
-        Layout.fillHeight: true
         Layout.preferredWidth: 200
+
+        Layout.leftMargin: 20
+        Layout.topMargin: 20
+
+        Text {
+            id: titleMeasurements
+            text: "MEASUREMENTS"
+            font.pixelSize: 30
+            color: colorBright
+        }
+
+        Rectangle {
+            id: line1
+            color: colorMain
+            height: 1
+            Layout.minimumWidth: 250
+        }
 
         ListView {
             id: currentValues
-            
-            width: parent.width
-            Layout.preferredHeight: 200
+
+            Layout.minimumHeight: count > 0 ? 200 : 0
 
             model: measurementModel
+
+            onCountChanged: {
+                if (count == 0) {
+                    measurementsEmptyText.visible = true;
+                } else {
+                    measurementsEmptyText.visible = false;
+                }
+            }
 
             delegate: MeasurementListItem {
                 Layout.fillWidth: true
                 height: 40
                 itemData: model
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop
+            Layout.topMargin: 20
+            visible: currentValues.count === 0
+
+            Text {
+                id: measurementsEmptyText
+                text: "No measurements available"
+                color: colorLightGrey
+            }
+
+            Text {
+                id: devicesEmptyText
+                text: "No devices available"
+                color: colorLightGrey
+            }
+        }
+
+        Rectangle {
+            id: line2
+            color: colorMain
+            height: 1
+            Layout.minimumWidth: 250
+        }
+
+        ListView {
+            id: deviceController
+
+            width: parent.width
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
+
+            model: deviceModel
+
+            onCountChanged: {
+                if (count == 0) {
+                    devicesEmptyText.visible = true;
+                } else {
+                    devicesEmptyText.visible = false;
+                }
+            }
+
+            delegate: DeviceListItem {
+                Layout.fillWidth: true
+                height: 40
+                itemData: model
+                roomIndex: currentRoomId
             }
         }
     }
@@ -70,43 +143,88 @@ RowLayout {
         Layout.alignment: Qt.AlignTop
         Layout.fillWidth: true
 
+        Layout.topMargin: 20
+
+        Text {
+            text: "INFO"
+            font.pixelSize: 30
+            color: colorBright
+        }
+
+        Rectangle {
+            color: colorMain
+            height: 1
+            Layout.minimumWidth: 250
+        }
+
         Text {
             id: currentTimeText
             color: colorBright
+            Layout.alignment: Qt.AlignBottom
+            font.pixelSize: 26
         }
 
         Text {
-            text: "Date: " + getCurrentDate()
+            text: getCurrentDate()
             color: colorBright
+            bottomPadding: 15
+            font.pixelSize: 26
+        }
+
+        RowLayout {
+            Text {
+                text: "Location: "
+                color: colorMain
+            }
+
+            ComboBox {
+                id: cityComboBox
+
+                Layout.preferredWidth: 200
+
+                model: citiesModel
+                displayText: cityComboBox.currentIndex === -1 ? "Select place" : locationData
+
+                delegate: ItemDelegate {
+                    contentItem: Text {
+                        text: model.name
+                        color: colorDarkGrey
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+                Component.onCompleted: {
+                    if (locationData !== "") {
+                        for (var i = 0; i < citiesModel.count; i++) {
+                            var city = citiesModel.get(i);
+                            if (city.name === locationData) {
+                                cityComboBox.currentIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                onActivated: {
+                    var index = cityComboBox.currentIndex;
+                    var selectedCity = citiesModel.get(index); 
+                    if (selectedCity) {
+                        latitude = parseFloat(selectedCity.latitude);
+                        longitude = parseFloat(selectedCity.longitude);
+                        locationData = selectedCity.name;
+                        storeLocationData();
+                        fetchWeather();
+                    }
+                }
+            }
         }
 
         Text {
-            text: "Location: " + locationData
-            color: colorBright
-            Component.onCompleted: fetchLocation() // Fetch the user's location on component completion
-        }
-
-        Text {
-            text: (weatherTemperature != "unknown") ? ("Weather: " + weatherTemperature + ", " + weatherDescription) : "Weather: unknown"
+            text: (weatherTemperature != "unknown") ? ("<font color='lightgreen'>Weather:</font> " + weatherTemperature + ", " + weatherDescription) : "<font color='lightgreen'>Weather:</font> unknown"
+            bottomPadding: 15
             color: colorBright
             Component.onCompleted: fetchWeather()
-        }
-
-        ListView {
-            id: deviceController
-
-            width: parent.width
-            height: parent.height - buttonRefresh.height // Adjust the height to account for the Refresh button
-            Layout.alignment: Qt.AlignTop
-
-            model: deviceModel
-
-            delegate: DeviceListItem {
-                Layout.fillWidth: true
-                height: 40
-                itemData: model
-                roomIndex: currentRoomId
-            }
         }
 
         Button {
@@ -121,63 +239,63 @@ RowLayout {
     }
 
     // Right side buttons (room selection)
-    ColumnLayout {
-        id: rightTabBarContentLayout
-        spacing: 3
-
+    // FIXME: when returned from settings, remember the last index that was selected to highlight that button
+    // rendering is otherwise ok, just the wrong room is selected
+    ScrollView {
         Layout.fillHeight: true
-        Layout.preferredWidth: 100
-        Layout.alignment: Qt.AlignTop
+        Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
-        property int preferredButtonHeight: Math.min(dashboardWindow.height / roomModel.count, 75)
+        ColumnLayout {
+            id: rightTabBarContentLayout
+            spacing: 3
 
-        Repeater {
-            model: roomModel
+            Layout.fillHeight: true
 
-            delegate: Button {
-                text: model.roomName
+            property int preferredButtonHeight: Math.min(dashboardWindow.height / roomModel.count, 75)
 
-                Layout.preferredWidth: 100
-                Layout.preferredHeight: rightTabBarContentLayout.preferredButtonHeight
+            Repeater {
+                model: roomModel
 
-                property bool isSelected: model.roomId == dashboardWindow.currentRoomId
+                delegate: Button {
+                    text: model.roomName
 
-                background: Rectangle {
-                    color: isSelected ? colorMain : colorBright
-                }
+                    Layout.preferredWidth: 100
+                    Layout.preferredHeight: rightTabBarContentLayout.preferredButtonHeight
 
-                // Emit a signal when the room button is clicked
-                onClicked: {       
-                    dashboardWindow.currentRoomId = model.roomId;
-                    dashboardCurrentRoomIdChanged(dashboardWindow.currentRoomId);
+                    property bool isSelected: model.roomId == dashboardWindow.currentRoomId
 
-                    console.log(dashboardWindow.height);
-                    console.log(roomModel.count);
-                    console.log(dashboardWindow.height / roomModel.count);
+                    background: Rectangle {
+                        color: hovered ? colorAccent : (isSelected ? colorMain : colorBright)
+                    }
+
+                    onClicked: {       
+                        dashboardWindow.currentRoomId = model.roomId;
+                        dashboardCurrentRoomIdChanged(dashboardWindow.currentRoomId);
+                    }
                 }
             }
         }
     }
 
-    Timer {
-        // FIXME: initialised but not updating
-        id: dashboardUpdateTimer
-        interval: 10000 // Update every 10 seconds
-        repeat: true
 
-        onTriggered: {
-            updateTimeAndWeather();
-            console.log("Timer triggered.");
-        }
+    function storeLocationData() {
+        backend.addLocation(latitude, longitude, locationData);
+    }
 
-        Component.onCompleted: {
-            updateTimeAndWeather(); // Update immediately upon component completion
-            console.log("timer initialised");
-        }
+    function retrieveLocationData() {
+        var location = backend.retrieveLocation();  
+        latitude = location[0];  
+        longitude = location[1]; 
+        locationData = location[2];
+    }
+
+    function loadCitiesData() {
+        var citiesData = backend.loadCitiesData();
+        citiesModel.updateModel(citiesData)
     }
 
     function updateTimeAndWeather() {
-        currentTimeText.text = "Time: " + getCurrentTime();
+        currentTimeText.text = getCurrentTime();
 
         if (new Date().getMinutes() == 0) {    // Update the weather every hour
             fetchWeather();
@@ -190,7 +308,7 @@ RowLayout {
         var minutes = currentTime.getMinutes();
         
         // Format the time as HH:MM
-        return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+        return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + "<font color='lightgreen'> h</font>";
     }
     
     function getCurrentDate() {
@@ -199,12 +317,17 @@ RowLayout {
         var month = currentDate.getMonth() + 1;
         var day = currentDate.getDate();
         
-        return day + "/" + (month < 10 ? "0" : "") + month + "/" + year;
+        return day + "<font color='lightgreen'>/</font>" + (month < 10 ? "0" : "") + month + "<font color='lightgreen'>/</font>" + year;
     }
 
     function fetchWeather() {
-        var weatherApiKey = "72a2a76b30dd2c83d3e9ca25905faa9c";     // TODO: store safely
-        var weatherApiUrl = "http://api.openweathermap.org/data/2.5/weather?q=Geneva,Switzerland&appid=" + weatherApiKey;
+        if(latitude == -1 || longitude == -1) {
+            weatherDescription = "unknown";
+            weatherTemperature = "unknown";
+            return;
+        }
+
+        var weatherApiUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + weatherApiKey;
 
         var request = new XMLHttpRequest();
         request.open("GET", weatherApiUrl);
@@ -215,7 +338,7 @@ RowLayout {
 
                     var description = response.weather[0].description;
                     var temperatureKelvin = response.main.temp;
-                    var temperatureCelsius = (temperatureKelvin - 273.15).toFixed(2);
+                    var temperatureCelsius = (temperatureKelvin - 273.15).toFixed(0);
 
                     weatherDescription = description;
                     weatherTemperature = temperatureCelsius + " °C";

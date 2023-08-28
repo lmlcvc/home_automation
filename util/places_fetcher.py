@@ -1,39 +1,16 @@
 import json
-import requests
 
-def run():
-    # Fetch country data
-    country_response = requests.get("https://restcountries.com/v3.1/all")
-    if country_response.ok:
-        countries = json.loads(country_response.text)
-    else:
-        print("Failed to fetch country data")
-        return
+city_data = []
 
-    # Fetch city data
-    city_response = requests.get("https://api.teleport.org/api/urban_areas/")
-    if city_response.ok:
-        cities_data = json.loads(city_response.text)
-        cities = [city["name"] for city in cities_data["_links"]["ua:item"]]
-    else:
-        print("Failed to fetch city data")
-        return
+# TODO: order alphabetically by name
+with open("HR.txt", "r") as file:
+    for line in file:
+        parts = line.strip().split("\t")
+        city_name, latitude, longitude = parts[2], parts[4], parts[5]
+        city_data.append({"name": city_name, "latitude": latitude, "longitude": longitude})
 
-    # Create a dictionary pairing each country with its cities
-    # XXX: cities with spaces and extra symbols have issues
-    country_city_mapping = {}
-    for city in cities:
-        country_response = requests.get(f"https://api.teleport.org/api/urban_areas/slug:{city.lower()}/")
-        if country_response.ok:
-            city_data = json.loads(country_response.text)
-            # x._links["ua:countries"][0].name
-            country_name = city_data["_links"]["ua:countries"][0]["name"]
-            if country_name not in country_city_mapping:
-                country_city_mapping[country_name] = []
-            country_city_mapping[country_name].append(city_data["name"])
-        else:
-            print(f"Failed to fetch data for city: {city}")
+# Save the data to a JSON file
+with open("cities_data.json", "w") as json_file:
+    json.dump(city_data, json_file, indent=4)
 
-    # Save the country-city mapping to a local JSON file
-    with open("places_data.json", "w") as file:
-        json.dump(country_city_mapping, file, indent=4)
+print("City data saved to cities_data.json")

@@ -5,7 +5,6 @@ ListModel {
 
     property int currentRoomId: -1
 
-    signal measurementUpdated(int roomId, string measurementName, string measurementValue)
 
     function updateModel(measurementObjects)
     {

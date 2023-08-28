@@ -1,5 +1,7 @@
 from backend import Backend
 
+# TODO: see if necessary
+
 # Create an instance of the Backend class
 backend_instance = Backend()
 

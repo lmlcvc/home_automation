@@ -4,7 +4,6 @@ import QtQuick.Layouts 1.15
 
 import "../util"
 
-
 ApplicationWindow {
     id: mainAppWindow
 
@@ -18,7 +17,7 @@ ApplicationWindow {
     // Set window dimensions and properties
     width: 1280
     height: 720
-    minimumWidth: 640
+    minimumWidth: 940
     minimumHeight: 360
     visible: true
     title: "Home Automation"
@@ -29,33 +28,20 @@ ApplicationWindow {
     // App control
     RowLayout {
         id: appControl
-        Layout.fillHeight: true
+        
+        width: parent.width
+        height: parent.height
 
         ColumnLayout {
             id: leftTabBar
 
-            Layout.fillWidth: false
             Layout.fillHeight: true
-
-            ButtonGroup {
-                id: featureButtonGroup
-                buttons: columnLayout.children
-
-                Component.onCompleted: {
-                    // Set the first button as checked by default
-                    if (buttons.length > 0) {
-                        buttons[0].checked = true;
-                    }
-                }
-            }
+            Layout.alignment: Qt.AlignTop
 
             FeatureButton {
                 id: featurebutton_control
                 text: qsTr("Dashboard")
                 icon.name: "dashboard"
-                Layout.fillHeight: true
-
-                checked: true
 
                 onClicked: {
                     featureButtonGroup.checkedButton = this;
@@ -64,20 +50,8 @@ ApplicationWindow {
             }
 
             FeatureButton {
-                text: qsTr("Management")
-                icon.name: "management"
-                Layout.fillHeight: true
-
-                onClicked: {
-                    featureButtonGroup.checkedButton = this;
-                    contentLoader.source = "management.qml"
-                }
-            }
-
-            FeatureButton {
                 text: qsTr("Settings")
                 icon.name: "settings"
-                Layout.fillHeight: true
 
                 onClicked: {
                     featureButtonGroup.checkedButton = this;
@@ -86,16 +60,27 @@ ApplicationWindow {
             }
         }
 
+        ButtonGroup {
+            id: featureButtonGroup
+            buttons: leftTabBar.children
+
+            Component.onCompleted: {
+                // Set the first button as checked by default
+                if (buttons.length > 0) {
+                    buttons[0].checked = true;
+                }
+            }
+        }
+
         // Content area
         Loader {
             id: contentLoader
+            Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.preferredWidth: mainAppWindow.width
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
             source: "dashboard.qml"
         }
     }
-
 
     RoomListModel {
         id: roomModel
@@ -152,11 +137,8 @@ ApplicationWindow {
         Component.onCompleted: {
             updateDevices();
         }
-
-        // TODO: catch room updating signals?
     }
 
-    // TODO: update measurements as they're incoming
     MesurementListModel {
         id: measurementModel
 
@@ -168,11 +150,20 @@ ApplicationWindow {
 
         Component.onCompleted: {
             updateMeasurements();
+            backend.measurementsUpdated.connect(updateMeasurements);
         }
+    }
 
-        onMeasurementUpdated: {
-            backend.updateMeasurement(roomId, measurementName, measurementValue);
-            updateMeasurements();
+    ListModel {
+        id: citiesModel
+
+        function updateModel(cityObjects)
+        {
+            citiesModel.clear()
+
+            for (var i = 0; i < cityObjects.length; i++) {
+                citiesModel.append(cityObjects[i])
+            }
         }
     }
 }

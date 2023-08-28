@@ -4,7 +4,7 @@ from util.message_thread import MessageThread
 
 
 LOG_THRESHOLD_HOURS = 24
-TEMPERATURE_RANGE = (-50, 100)
+TEMPERATURE_RANGE = (-20, 45)
 HUMIDITY_RANGE = (0, 100)
 POSITIVE_MIN = 0
 BRIGHTNESS_RANGE = (0, 1000)
@@ -49,7 +49,8 @@ def is_valid_value(measurement, value):
     else:                                               # Unknown measurement type, consider it invalid
         return False
 
-
+# TODO: switch measurement logic so that measurements are up to x seconds old
+# XXX: could keep a log of older measurements (per day for example)
 class MessageLogger:
     def __init__(self, backend):
         self.backend = backend
@@ -115,6 +116,7 @@ class MessageLogger:
             file.write(log_entry)
 
         remove_outdated_logs(log_file)
+    
 
     def log_error(self, err_entry):
         log_dir = os.path.join(os.getcwd(), self.log_dir)
