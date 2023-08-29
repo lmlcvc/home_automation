@@ -3,7 +3,6 @@ import QtQuick 2.15
 ListModel {
     id: roomListModel
 
-    // XXX: check for redundant signals when finished implementation
     signal addRoom(string roomName, var devices)
     signal roomEdited(int roomId, string newRoomName)
     signal roomDeleted(int roomId)

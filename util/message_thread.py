@@ -61,4 +61,4 @@ class MessageThread(QThread):
                     self.messageReceived.emit(message)
                     self.backend.emitMeasurementsUpdated()
 
-            time.sleep(1)
+            time.sleep(0.5)

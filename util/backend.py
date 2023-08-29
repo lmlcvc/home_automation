@@ -5,6 +5,9 @@ import configparser
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
+QML_IMPORT_NAME = "Backend"
+QML_IMPORT_MAJOR_VERSION = 1
+
 
 class Backend(QObject):
     measurementsUpdated = pyqtSignal()
@@ -157,14 +160,24 @@ class Backend(QObject):
                 break
         return devices
 
+    def get_measurement_threshold(self, measurement):
+        measurement_thresholds = {
+            'temperature': 300,         # 5 minutes
+            'humidity': 300,            # 5 minutes
+            'air pressure': 600,        # 10 minutes
+            'brightness': 30,           # 30 seconds
+            'power consumption': 600    # 10 minutes
+        }
+        return measurement_thresholds.get(measurement, 0)
+
     @pyqtSlot(int, result=list)
     def loadMeasurements(self, currentRoomId):
         measurement_units = {
             "temperature": "°C",
             "humidity": "%",
             "air pressure": "hPa",
-            "power_consumption": "%",
-            "brightness": "lux",
+            "power consumption": "%",
+            "brightness": "lux"
         }
 
         measurement_files = [
@@ -183,13 +196,25 @@ class Backend(QObject):
                         measurement_name = measurement_file.replace(
                             ".log", "").replace("_", " ")
 
+                        timestamp = datetime.datetime.strptime(
+                            timestamp_str, '%Y-%m-%d %H:%M:%S')
+
+                        max_measurement_age = self.get_measurement_threshold(
+                            measurement_name)
+
                         if 'err' not in value.lower():
+                            measurement_age = datetime.datetime.now() - timestamp
 
-                            measurements.append({
-                                "name": measurement_name,
-                                "value": value + " " + measurement_units.get(measurement_name, ""),
-                            })
-
+                            if measurement_age.total_seconds() <= max_measurement_age:
+                                measurements.append({
+                                    "name": measurement_name,
+                                    "value": value + " " + measurement_units.get(measurement_name, ""),
+                                })
+                            else:
+                                measurements.append({
+                                    "name": measurement_name,
+                                    "value": "UNKNOWN (old)",
+                                })
                             break
                         else:
                             measurements.append({

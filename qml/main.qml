@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import "../util"
+import Backend 1
 
 ApplicationWindow {
     id: mainAppWindow
@@ -14,7 +15,7 @@ ApplicationWindow {
     readonly property color colorLightGrey: "#888"
     readonly property color colorDarkGrey: "#111"
 
-    property int lastSelectedIndex: -1
+    property int lastSelectedIndex
 
     // Set window dimensions and properties
     width: 1280
@@ -168,5 +169,9 @@ ApplicationWindow {
                 citiesModel.append(cityObjects[i])
             }
         }
+    }
+
+    Backend {
+        id: backend
     }
 }

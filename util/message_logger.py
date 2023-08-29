@@ -2,7 +2,6 @@ import os
 from datetime import datetime, timedelta
 from util.message_thread import MessageThread
 
-
 LOG_THRESHOLD_HOURS = 24
 TEMPERATURE_RANGE = (-20, 45)
 HUMIDITY_RANGE = (0, 100)
@@ -10,47 +9,6 @@ POSITIVE_MIN = 0
 BRIGHTNESS_RANGE = (0, 1000)
 
 
-def remove_outdated_logs(log_file):
-    with open(log_file, 'r') as file:
-        lines = file.readlines()
-
-    if len(lines) == 0:
-        return
-
-    timestamp_format = '%Y-%m-%d %H:%M:%S'
-    current_time = datetime.now()
-
-    # Calculate the timestamp threshold for outdated logs
-    threshold = current_time - timedelta(hours=LOG_THRESHOLD_HOURS)
-
-    # Filter the log entries that are within the threshold
-    filtered_entries = [line for line in lines if
-                        datetime.strptime(line.strip().split(',')[0], timestamp_format) >= threshold]
-
-    # Rewrite the log file with the filtered entries
-    with open(log_file, 'w') as file:
-        file.write(''.join(filtered_entries))
-
-
-def is_valid_value(measurement, value):
-    # Perform validity checks based on the measurement type and value
-    if measurement == 'T':                              # within range
-        value = float(value)
-        return TEMPERATURE_RANGE[0] <= value <= TEMPERATURE_RANGE[1]
-    elif measurement == 'H':                            # within range
-        value = float(value)
-        return HUMIDITY_RANGE[0] <= value <= HUMIDITY_RANGE[1]
-    elif measurement == 'P' or measurement == 'C':      # positive
-        value = float(value)
-        return value >= POSITIVE_MIN
-    elif measurement == 'B':                            # within range
-        value = float(value)
-        return BRIGHTNESS_RANGE[0] <= value <= BRIGHTNESS_RANGE[1]
-    else:                                               # Unknown measurement type, consider it invalid
-        return False
-
-# TODO: switch measurement logic so that measurements are up to x seconds old
-# XXX: could keep a log of older measurements (per day for example)
 class MessageLogger:
     def __init__(self, backend):
         self.backend = backend
@@ -90,7 +48,7 @@ class MessageLogger:
             is_error = True
             return
 
-        if not is_valid_value(measurement, value):
+        if not self.is_valid_value(measurement, value):
             print(f"{current_time} - Invalid {measurement} value: {value}")
             error_msg = f"{current_time}\tInvalid value\t{message}\n"
             self.log_error(error_msg)
@@ -106,17 +64,24 @@ class MessageLogger:
         measurement_name = measurement_names[measurement]
 
         log_dir = os.path.join(os.getcwd(), self.log_dir, room_id)
-        log_file = os.path.join(log_dir, f"{measurement_name}.log")
+        daily_log_dir = os.path.join(os.getcwd(), self.log_dir, "daily")
+        daily_log_file = os.path.join(
+            daily_log_dir, f"{current_time.strftime('%Y-%m-%d')}.log")
+        specific_log_file = os.path.join(log_dir, f"{measurement_name}.log")
         os.makedirs(log_dir, exist_ok=True)
+        os.makedirs(daily_log_dir, exist_ok=True)
 
         timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
         log_entry = f"{timestamp}, {value}\n" if not is_error else f"{timestamp}, ERR\n"
+        log_entry_daily = f"{timestamp}, {measurement}, {value}\n" if not is_error else f"{timestamp}, {measurement}, ERR\n"
 
-        with open(log_file, 'a') as file:
+        with open(specific_log_file, 'a') as file:
             file.write(log_entry)
 
-        remove_outdated_logs(log_file)
-    
+        with open(daily_log_file, 'a') as file:
+            file.write(log_entry_daily)
+
+        self.remove_outdated_logs(specific_log_file, measurement)
 
     def log_error(self, err_entry):
         log_dir = os.path.join(os.getcwd(), self.log_dir)
@@ -126,3 +91,48 @@ class MessageLogger:
 
         with open(log_file, 'a') as file:
             file.write(err_entry)
+
+    def remove_outdated_logs(self, log_file, measurement):
+        with open(log_file, 'r') as file:
+            lines = file.readlines()
+
+        if len(lines) == 0:
+            return
+
+        timestamp_format = '%Y-%m-%d %H:%M:%S'
+        current_time = datetime.now()
+
+        threshold = current_time - \
+            timedelta(seconds=self.get_measurement_threshold(measurement))
+
+        filtered_entries = [line for line in lines if
+                            datetime.strptime(line.strip().split(',')[0], timestamp_format) >= threshold]
+
+        with open(log_file, 'w') as file:
+            file.write(''.join(filtered_entries))
+
+    def is_valid_value(self, measurement, value):
+        if measurement == 'T':
+            value = float(value)
+            return TEMPERATURE_RANGE[0] <= value <= TEMPERATURE_RANGE[1]
+        elif measurement == 'H':
+            value = float(value)
+            return HUMIDITY_RANGE[0] <= value <= HUMIDITY_RANGE[1]
+        elif measurement == 'P' or measurement == 'C':
+            value = float(value)
+            return value >= POSITIVE_MIN
+        elif measurement == 'B':
+            value = float(value)
+            return BRIGHTNESS_RANGE[0] <= value <= BRIGHTNESS_RANGE[1]
+        else:
+            return False
+
+    def get_measurement_threshold(self, measurement):
+        measurement_thresholds = {
+            'T': 300,   # 5 minutes
+            'H': 300,   # 5 minutes
+            'P': 600,   # 10 minutes
+            'B': 30,    # 30 seconds
+            'C': 600    # 10 minutes
+        }
+        return measurement_thresholds.get(measurement, 0)

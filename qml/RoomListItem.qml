@@ -5,6 +5,8 @@ import QtQuick.Dialogs 1.3
 
 
 Item {
+    id: roomListItem
+
     Layout.fillWidth: true
 
     property var itemData: { }
@@ -158,7 +160,6 @@ Item {
         }
 
         Dialog {
-            // FIXME: align delete button to right
             id: manageRoomDevicesDialog
             title: "Manage Devices"
             standardButtons: StandardButton.Ok | StandardButton.Cancel
@@ -177,26 +178,36 @@ Item {
                 spacing: 10
 
                 Button {
+                    id: buttonAddDevice
                     text: "Add Device"
+                    Layout.preferredWidth: manageRoomDevicesDialog.width - 40
+                    Layout.alignment: Qt.AlignCenter
+                    verticalPadding: 15
+                    Layout.bottomMargin: 20
+
                     onClicked: {
                         addDeviceDialog.open();
                     }
+
+                    background: Rectangle {
+                        color: buttonAddDevice.hovered ? colorMain : colorAccent
+                    }
                 }
 
-                // FIXME: scrolling not possible
-                // scrollview or flickable
                 ScrollView {
                     Layout.fillWidth: true
-                    /*contentWidth: deviceListView.contentWidth
-                    contentHeight: deviceListView.contentHeight
-                    interactive: true */
-                    height: 300
+                    Layout.preferredHeight: 300
+                    width: parent.width
+                    Layout.topMargin: 20
+                    Layout.bottomMargin: 50
 
                     ListView {
                         id: deviceListView
+
                         width: parent.width
+                        height: parent.height
+
                         spacing: 10
-                        height: 300
 
                         model: manageRoomDevicesDialog.displayedDevices
 
@@ -205,13 +216,15 @@ Item {
                             height: 40
 
                             Text {
-                                //Layout.fillWidth: true
+                                id: deviceNameText
+                                Layout.preferredWidth: 350
                                 Layout.alignment: Qt.AlignLeft
                                 text: model.name + " (" + model.measurement + ")"
+                                elide: Text.ElideRight	
                             }
 
                             Item {
-                                //Layout.fillWidth: true
+                                width: 100
                                 height: buttonDelete.implicitHeight
                                 Layout.alignment: Qt.AlignRight
 
@@ -233,6 +246,10 @@ Item {
                                     }
                                 }
                             }
+
+                            Item {
+                                Layout.fillWidth: true
+                            }
                         }
                     }
                 }    
@@ -250,8 +267,6 @@ Item {
                     });
                 }
                 roomModel.devicesUpdated(itemData.roomId, updatedDevices);
-                // XXX: Only emit the signal if there were changes
-                // for example introduce a changesOccurred boolean to the dialog that will be set to true on any deviceList update
             }
 
             Dialog {
@@ -300,14 +315,11 @@ Item {
                 }
 
                 onAccepted: {
-                    var dialogDisplayedDevices = Array.from(manageRoomDevicesDialog.displayedDevices);
                     newDeviceName = newDeviceNameField.text;
                     newDeviceMeasurement = measurementComboBox.currentText;
 
                     if (newDeviceName.trim() === "") {
                         showErrorMessage("Device name must not be empty.");
-                    } else if (dialogDisplayedDevices.some(function(device) { return device.name.toLowerCase() == newDeviceName.toLowerCase(); })) {  // FIXME: always false
-                        showErrorMessage("Device name already exists in this room.");
                     } else {
                         var newDevice = {
                             name: newDeviceName,

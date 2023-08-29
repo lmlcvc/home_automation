@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QGuiApplication
-from PyQt5.QtQml import QQmlApplicationEngine
+from PyQt5.QtQml import QQmlApplicationEngine, qmlRegisterType
 import os
 import configparser
 from util import message_logger, backend, places_fetcher
@@ -12,6 +12,7 @@ config = config['default']
 WEATHER_API_KEY = config['weatherApiKey']
 
 if __name__ == '__main__':
+    os.environ['QML_XHR_ALLOW_FILE_READ'] = '1'
     app = QGuiApplication([])
     engine = QQmlApplicationEngine()
 
@@ -25,7 +26,10 @@ if __name__ == '__main__':
 
     # Register the backend object as a context property
     # XXX: instantiate somewhere else, not globally accessible
-    engine.rootContext().setContextProperty("backend", m_backend)
+
+    # qmlRegisterType(backend.Backend, 'BackendModule', 1, 0, 'Backend')
+
+    # engine.rootContext().setContextProperty("backend", m_backend)
     engine.rootContext().setContextProperty("weatherApiKey", WEATHER_API_KEY)
 
     # Load the QML file

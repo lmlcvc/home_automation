@@ -33,8 +33,8 @@ RowLayout {
 
         loadCitiesData();
         retrieveLocationData();
-        updateTimeAndWeather();
-        fetchWeather();
+        deviceModel.updateDevices();
+        refreshAllContent();
     }
 
     // Current values
@@ -277,6 +277,21 @@ RowLayout {
         }
     }
 
+     Timer {
+        id: dashboardUpdateTimer
+        interval: 10000 // Update every 10 seconds
+        repeat: true
+        running: true
+        triggeredOnStart: true
+
+        onTriggered: {
+            updateTimeAndWeather();
+        }
+
+        Component.onCompleted: {
+            updateTimeAndWeather(); // Update immediately upon component completion
+        }
+    }
 
     function storeLocationData() {
         backend.addLocation(latitude, longitude, locationData);
