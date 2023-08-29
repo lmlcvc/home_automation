@@ -7,7 +7,6 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 
 class Backend(QObject):
-    dataLoaded = pyqtSignal()       # TODO: see if necessary
     measurementsUpdated = pyqtSignal()
 
     def __init__(self):
@@ -78,7 +77,6 @@ class Backend(QObject):
     @pyqtSlot(result=list)
     def loadData(self):
         self.load_room_list()
-        self.dataLoaded.emit()
         return self.room_list
 
     @pyqtSlot(int)
