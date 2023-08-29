@@ -26,7 +26,7 @@ RowLayout {
     }
 
     Component.onCompleted: {
-        if (roomModel.count > 0) {
+        if (roomModel.count > 0 && currentRoomId == -1) {
             currentRoomId = roomModel.get(0).roomId;
             dashboardCurrentRoomIdChanged(currentRoomId);
         }
@@ -120,8 +120,10 @@ RowLayout {
             onCountChanged: {
                 if (count == 0) {
                     devicesEmptyText.visible = true;
+                    line2.visible = false;
                 } else {
                     devicesEmptyText.visible = false;
+                    line2.visible = true;
                 }
             }
 
@@ -238,9 +240,6 @@ RowLayout {
         }
     }
 
-    // Right side buttons (room selection)
-    // FIXME: when returned from settings, remember the last index that was selected to highlight that button
-    // rendering is otherwise ok, just the wrong room is selected
     ScrollView {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignTop | Qt.AlignRight
@@ -271,6 +270,7 @@ RowLayout {
                     onClicked: {       
                         dashboardWindow.currentRoomId = model.roomId;
                         dashboardCurrentRoomIdChanged(dashboardWindow.currentRoomId);
+                        mainAppWindow.lastSelectedIndex = dashboardWindow.currentRoomId;
                     }
                 }
             }

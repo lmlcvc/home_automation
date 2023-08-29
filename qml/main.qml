@@ -14,6 +14,8 @@ ApplicationWindow {
     readonly property color colorLightGrey: "#888"
     readonly property color colorDarkGrey: "#111"
 
+    property int lastSelectedIndex: -1
+
     // Set window dimensions and properties
     width: 1280
     height: 720
@@ -45,7 +47,8 @@ ApplicationWindow {
 
                 onClicked: {
                     featureButtonGroup.checkedButton = this;
-                    contentLoader.source = "dashboard.qml"
+                    contentLoader.source = "dashboard.qml";
+                    contentLoader.item.currentRoomId = lastSelectedIndex;
                 }
             }
 
@@ -55,7 +58,7 @@ ApplicationWindow {
 
                 onClicked: {
                     featureButtonGroup.checkedButton = this;
-                    contentLoader.source = "settings.qml"
+                    contentLoader.source = "settings.qml";
                 }
             }
         }
