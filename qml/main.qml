@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import "../util"
-import Backend 1
+//import Backend 1
 
 ApplicationWindow {
     id: mainAppWindow
@@ -133,9 +133,9 @@ ApplicationWindow {
         id: deviceModel
 
         function updateDevices() {
-            var loadedList = backend.getDevicesForRoom(contentLoader.item.currentRoomId);
-            deviceModel.updateRoomId(contentLoader.item.currentRoomId);
-            deviceModel.updateModel(loadedList);
+                var loadedList = backend.getDevicesForRoom(contentLoader.item.currentRoomId);
+                deviceModel.updateRoomId(contentLoader.item.currentRoomId);
+                deviceModel.updateModel(loadedList);
         }
 
         Component.onCompleted: {
@@ -147,9 +147,12 @@ ApplicationWindow {
         id: measurementModel
 
         function updateMeasurements() {
-            var loadedList = backend.loadMeasurements(contentLoader.item.currentRoomId);
-            measurementModel.updateRoomId(contentLoader.item.currentRoomId);
-            measurementModel.updateModel(loadedList);
+            var id = contentLoader.item.currentRoomId;
+            if(id != null) {
+                var loadedList = backend.loadMeasurements(id);
+                measurementModel.updateRoomId(contentLoader.item.currentRoomId);
+                measurementModel.updateModel(loadedList);
+            }
         }
 
         Component.onCompleted: {
@@ -171,7 +174,7 @@ ApplicationWindow {
         }
     }
 
-    Backend {
+    /*Backend {
         id: backend
-    }
+    }*/
 }

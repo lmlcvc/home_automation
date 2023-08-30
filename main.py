@@ -24,12 +24,7 @@ if __name__ == '__main__':
     if not os.path.isfile("cities_data.json"):
         places_fetcher.run()
 
-    # Register the backend object as a context property
-    # XXX: instantiate somewhere else, not globally accessible
-
-    # qmlRegisterType(backend.Backend, 'BackendModule', 1, 0, 'Backend')
-
-    # engine.rootContext().setContextProperty("backend", m_backend)
+    engine.rootContext().setContextProperty("backend", m_backend)       # TODO: make QML object
     engine.rootContext().setContextProperty("weatherApiKey", WEATHER_API_KEY)
 
     # Load the QML file

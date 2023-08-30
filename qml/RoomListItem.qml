@@ -31,19 +31,19 @@ Item {
         Layout.fillWidth: true
 
         Rectangle {
-            width: parent.width
+            Layout.preferredWidth: parent.width
             height: 2
             color: colorDarkGrey
         }
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignRight  // Align the whole row to the right
 
             Text {
                 text: roomName
                 leftPadding: 15
                 Layout.alignment: Qt.AlignLeft
+                Layout.preferredWidth: roomListItem.width - 200
             }
 
             RowLayout {
@@ -68,8 +68,14 @@ Item {
                         color: "transparent"
                     }
 
-                    onClicked: {
-                        editRoomDialog.open()
+                    MouseArea {
+                        width: parent.width
+                        height: parent.height
+                        cursorShape: button_edit.hovered ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+                        onClicked: {
+                            editRoomDialog.open();
+                        }
                     }
                 }
 
@@ -84,13 +90,19 @@ Item {
                     icon.source: "../images/delete.png"
                     Layout.alignment: Qt.AlignRight
 
-                   background: Rectangle {
+                    background: Rectangle {
                         color: "transparent"
                     }
 
-                    onClicked: {
-                        deleteRoomDialog.roomName = roomName;
-                        deleteRoomDialog.open();
+                    MouseArea {
+                        width: parent.width
+                        height: parent.height
+                        cursorShape: button_delete.hovered ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+                        onClicked: {
+                            deleteRoomDialog.roomName = roomName;
+                            deleteRoomDialog.open();
+                        }
                     }
                 }
 
@@ -105,13 +117,19 @@ Item {
                     icon.source: "../images/manage.png"
                     Layout.alignment: Qt.AlignRight
 
-                   background: Rectangle {
+                    background: Rectangle {
                         color: "transparent"
                     }
 
-                    onClicked: {
-                        manageRoomDevicesDialog.roomName = roomName;
-                        manageRoomDevicesDialog.open();
+                    MouseArea {
+                        width: parent.width
+                        height: parent.height
+                        cursorShape: button_manage.hovered ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+                        onClicked: {
+                            manageRoomDevicesDialog.roomName = roomName;
+                            manageRoomDevicesDialog.open();
+                        }
                     }
                 }
             }
@@ -273,6 +291,9 @@ Item {
                 id: addDeviceDialog
                 title: "Add Device"
                 standardButtons: StandardButton.Ok | StandardButton.Cancel
+
+                width: 300
+                height: 150
 
                 property string newDeviceName: ""
                 property string newDeviceMeasurement: "temperature" // Default measurement

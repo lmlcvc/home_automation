@@ -4,39 +4,54 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.15
 
 ColumnLayout {
-    width: parent.width
-    height: parent.height
+    id: settingsWindow
+    Layout.preferredWidth: parent.width
+    Layout.preferredHeight: parent.height
 
     RowLayout {
         id: top
 
+        Layout.fillWidth: true
+        Layout.topMargin: 15
+        Layout.bottomMargin: 25
+        Layout.leftMargin: 15
+        Layout.rightMargin: 15
+
         Text {
-            id: title
-            text: "Settings"
-            font.pixelSize: 20
-            color: "#eeeeee"
+            id: titleSettings
+            text: "SETTINGS"
+            font.pixelSize: 30
+            color: colorBright
+            Layout.preferredWidth: settingsWindow.width - 150
         }
 
         Button {
             id: button_add_room
-            width: 46
-            height: 46
-            implicitWidth: width
-            implicitHeight: height
-            icon.width: width
-            icon.height: height
-            icon.source: "../images/add.png"
-            Layout.alignment: Qt.AlignLeft
-            onClicked: {
-                addRoomDialog.open()
+            text: "ADD ROOM"
+            Layout.preferredWidth: 100
+            Layout.alignment: Qt.AlignRight
+            verticalPadding: 15
+
+            background: Rectangle {
+                color: button_add_room.hovered ? colorAccent : colorLightGrey
+            }
+
+            MouseArea {
+                width: parent.width
+                height: parent.height
+                cursorShape: button_add_room.hovered ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+                onClicked: {
+                    addRoomDialog.open();
+                }
             }
         }
     }
 
     ListView {
         id: list_rooms
-        width: parent.width
-        height: parent.height
+        Layout.preferredWidth: parent.width
+        Layout.preferredHeight: parent.height
 
         model: roomModel
 
@@ -52,6 +67,9 @@ ColumnLayout {
         id: addRoomDialog
         title: "Add Room"
         standardButtons: StandardButton.Ok | StandardButton.Cancel
+
+        width: 300
+        height: 100
 
         ColumnLayout {
             TextField {
